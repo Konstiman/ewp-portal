@@ -1,0 +1,10 @@
+potencialne verejna API:
+ Institutions API (institutions)
+ Organizational Units API (organizational-units)
+ Courses API (courses)
+ Simple Course Replication API (simple-course-replication)
+
+
+Institutions API jede na:
+ https://ewp.uw.edu.pl/ewp/institutions (uw.edu.pl)
+  
