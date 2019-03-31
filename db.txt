@@ -1,0 +1,5 @@
+GRANT ALL PRIVILEGES ON *.* TO 'username'@'localhost' IDENTIFIED BY 'TODO password';
+
+CREATE DATABASE ewpportal;
+
+USE ewpportal;
