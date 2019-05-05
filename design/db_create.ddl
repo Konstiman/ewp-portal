@@ -1,15 +1,16 @@
 CREATE TABLE academic_term (id int(10) NOT NULL AUTO_INCREMENT, yearIdentifier varchar(100) NOT NULL, termIdentifier varchar(100), name varchar(1000), `start` date NOT NULL, `end` date NOT NULL, PRIMARY KEY (id));
 CREATE TABLE academic_term_name (academic_term int(10) NOT NULL, name varchar(1000), language int(10) NOT NULL);
-CREATE TABLE address (id int(10) NOT NULL AUTO_INCREMENT, recipient varchar(1000), addressLine varchar(1000), buildingNumber varchar(100), buildingName varchar(1000), streetName varchar(1000), unit varchar(100), floor varchar(100), pobox varchar(1000), deliveryPoint varchar(1000), PRIMARY KEY (id));
+CREATE TABLE address (id int(10) NOT NULL AUTO_INCREMENT, recipient varchar(1000), addressLines varchar(1000), buildingNumber varchar(100), buildingName varchar(1000), streetName varchar(1000), unit varchar(100), floor varchar(100), pobox varchar(1000), deliveryPoint varchar(1000), postalCode varchar(100), locality varchar(1000), region varchar(1000), country int(10), PRIMARY KEY (id));
 CREATE TABLE contact (id int(10) NOT NULL AUTO_INCREMENT, gender int(2), location_address int(10), mailing_address int(10), PRIMARY KEY (id));
 CREATE TABLE contact_description (contact int(10) NOT NULL, text varchar(4000) NOT NULL, language int(10));
 CREATE TABLE contact_email (contact int(10) NOT NULL, email varchar(500));
 CREATE TABLE contact_fax (contact int(10) NOT NULL, faxNumber varchar(100));
 CREATE TABLE contact_name (contact int(10) NOT NULL, name varchar(1000) NOT NULL, language int(10), type varchar(100) NOT NULL);
 CREATE TABLE contact_phone (contact int(10) NOT NULL, phoneNumber varchar(100));
+CREATE TABLE country (id int(10) NOT NULL AUTO_INCREMENT, code varchar(100) NOT NULL, name_en varchar(1000), name_cz varchar(1000), PRIMARY KEY (id));
 CREATE TABLE credit (opportunity_instance int(10) NOT NULL, scheme varchar(1000) NOT NULL, level varchar(64), value decimal(10, 2) NOT NULL);
 CREATE TABLE grading_scheme (opportunity_instance int(10) NOT NULL, label varchar(1000), description varchar(4000), language int(10));
-CREATE TABLE institution (id int(10) NOT NULL AUTO_INCREMENT, identifier varchar(64) NOT NULL UNIQUE, abbreviation varchar(20), logo_url int(1000), location_address int(10), mailing_address int(10), PRIMARY KEY (id));
+CREATE TABLE institution (id int(10) NOT NULL AUTO_INCREMENT, identifier varchar(64) NOT NULL UNIQUE, abbreviation varchar(20), logo_url varchar(1000), location_address int(10), mailing_address int(10), PRIMARY KEY (id));
 CREATE TABLE institution_contact (institution int(10) NOT NULL, contact int(10) NOT NULL, PRIMARY KEY (institution, contact));
 CREATE TABLE institution_factsheet (institution int(10) NOT NULL, name varchar(1000) NOT NULL, url varchar(100) NOT NULL, language int(10));
 CREATE TABLE institution_name (institution int(10) NOT NULL, name varchar(1000) NOT NULL, language int(10));
@@ -24,7 +25,7 @@ CREATE TABLE opportunity_type (id int(10) NOT NULL AUTO_INCREMENT, name_en varch
 CREATE TABLE opportunity_website (learning_opportunity int(10) NOT NULL, url varchar(1000) NOT NULL, language int(10));
 CREATE TABLE result_distribution_category (opportunity_instance int(10) NOT NULL, label varchar(1000) NOT NULL, count int(10) NOT NULL, `order` int(10) NOT NULL);
 CREATE TABLE result_distribution_description (opportunity_instance int(10) NOT NULL, description varchar(4000) NOT NULL, language int(10));
-CREATE TABLE unit (id int(10) NOT NULL AUTO_INCREMENT, identifier varchar(64) NOT NULL, institution int(10) NOT NULL, root int(1), code varchar(1000), abbreviation varchar(20), logo_url int(1000), parent int(10), location_address int(10), mailing_address int(10), PRIMARY KEY (id));
+CREATE TABLE unit (id int(10) NOT NULL AUTO_INCREMENT, identifier varchar(64) NOT NULL, institution int(10) NOT NULL, root int(1), code varchar(1000), abbreviation varchar(20), logo_url varchar(1000), parent int(10), location_address int(10), mailing_address int(10), PRIMARY KEY (id));
 CREATE TABLE unit_contact (unit int(10) NOT NULL, contact int(10) NOT NULL, PRIMARY KEY (unit, contact));
 CREATE TABLE unit_factsheet (unit int(10) NOT NULL, name varchar(1000) NOT NULL, url varchar(100) NOT NULL, language int(10));
 CREATE TABLE unit_name (unit int(10) NOT NULL, name varchar(1000) NOT NULL, language int(10));
@@ -81,4 +82,5 @@ ALTER TABLE contact_description ADD CONSTRAINT FKcontact_de297673 FOREIGN KEY (l
 ALTER TABLE contact_email ADD CONSTRAINT FKcontact_em902284 FOREIGN KEY (contact) REFERENCES contact (id);
 ALTER TABLE contact_phone ADD CONSTRAINT FKcontact_ph878896 FOREIGN KEY (contact) REFERENCES contact (id);
 ALTER TABLE contact_fax ADD CONSTRAINT FKcontact_fa267633 FOREIGN KEY (contact) REFERENCES contact (id);
+ALTER TABLE address ADD CONSTRAINT FKaddress974202 FOREIGN KEY (country) REFERENCES country (id);
 
