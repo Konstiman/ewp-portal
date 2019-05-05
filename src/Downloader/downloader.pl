@@ -7,74 +7,48 @@ use lib 'lib/';
 use Data::Dumper;
 use Downloader;
 
-use XML::LibXML;
-use XML::LibXML::PrettyPrint;
-
 my $downloader = Downloader->new();
 
 my $xml = $downloader->downloadCatalogue();
 
-print $xml;
+if ( !$xml ) {
+    die 'Catalogue download failed'
+      . ( $downloader->statusLine() ? ': ' . $downloader->statusLine() : '.' );
+}
+
+my $heis2endpoints = $downloader->parseCatalogueXML( $xml );
+
+my ( $statsSkipped, $statsDownloaded ) = ( 0, 0 );
+
+foreach my $heiId (keys %$heis2endpoints) {
+	my $endpoints = $heis2endpoints->{ $heiId };
+
+	if ( $endpoints->{ 'institutions' } ) {
+		my $xml = $downloader->downloadXML( $endpoints->{ 'institutions' } . '?hei_id=' . $heiId );
+		if ( $xml ) {
+			++$statsDownloaded;
+			print "\n$xml\n\n";
+		}
+		else {
+			# pokud nejsou ani zakladni informace o univerzite, nema cenu pokracovat
+			++$statsSkipped;
+			print $downloader->statusLine() . "\n";
+			next;
+		}
+	}
+	else {
+		# pokud nejsou ani zakladni informace o univerzite, nema cenu pokracovat
+		++$statsSkipped;
+		next;
+	}
+}
+
+print "
+downloaded: $statsDownloaded
+skipped:    $statsSkipped
+";
 
 =comment
-
-my $dom = XML::LibXML->load_xml( string => $xml );
-my $xpc = new XML::LibXML::XPathContext($dom);
-
-$xpc->registerNs( 'c',
-'https://github.com/erasmus-without-paper/ewp-specs-api-registry/tree/stable-v1'
-);
-
-my @heiNodes = $xpc->findnodes('//c:institutions/c:hei');
-
-# TODO pouzivat pak objekty (instance Institution)
-my @heiIds = ();
-
-foreach my $hei (@heiNodes) {
-
-    my $id = $hei->getAttribute('id');
-
-    # TODO chyba v prefixu
-    #my @nameNodes = $hei->findnodes( './c:name' );
-
-    # TODO zpracovat jmena
-
-    # TODO zpracovat other ids
-
-    push @heiIds, $id;
-}
-
-$xpc->registerNs( 'in2',
-'https://github.com/erasmus-without-paper/ewp-specs-api-institutions/blob/stable-v2/manifest-entry.xsd'
-);
-
-my %urls = ();
-
-foreach my $heiId (@heiIds) {
-
-    # TODO ostatni tri api
-    my @instAPIs =
-      $xpc->findnodes( '//c:hei-id[text()="'
-          . $heiId
-          . '"]/../../c:apis-implemented/in2:institutions' );
-
-    next if !@instAPIs;
-
-    # TODO volba verze
-    my $instAPI = shift @instAPIs;
-
-    # TODO ukladani nastaveni (napr. max-hei-ids)
-    my $url = $xpc->findvalue( './in2:url[text()]', $instAPI );
-
-    if ( $urls{$url} ) {
-        push @{ $urls{$url} }, $heiId;
-    }
-    else {
-        $urls{$url} = [$heiId];
-    }
-}
-
-$agent->timeout(10);
 
 foreach my $url ( keys %urls ) {
 
