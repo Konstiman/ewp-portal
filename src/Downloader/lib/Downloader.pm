@@ -45,7 +45,7 @@ Stahne XML katalog z adresy C<catalogueUrl>.
 sub downloadCatalogue {
     my $self = shift;
 
-    return $self->downloadXML( CATALOGUE_URL );
+    return $self->downloadXML(CATALOGUE_URL);
 }
 
 =head2 C<downloadXML ( url : Str ) : Str>
@@ -108,19 +108,23 @@ sub parseCatalogueXML {
         next if !$heiId;
 
         my %apis2namespaces = (
-            'institutions' => 'https://github.com/erasmus-without-paper/ewp-specs-api-institutions/blob/stable-v2/manifest-entry.xsd',
-            'organizational-units' => 'https://github.com/erasmus-without-paper/ewp-specs-api-ounits/blob/stable-v2/manifest-entry.xsd',
-            'courses' => 'https://github.com/erasmus-without-paper/ewp-specs-api-courses/blob/stable-v1/manifest-entry.xsd',
-            'simple-course-replication' => 'https://github.com/erasmus-without-paper/ewp-specs-api-course-replication/blob/stable-v1/manifest-entry.xsd'
+            'institutions' =>
+'https://github.com/erasmus-without-paper/ewp-specs-api-institutions/blob/stable-v2/manifest-entry.xsd',
+            'organizational-units' =>
+'https://github.com/erasmus-without-paper/ewp-specs-api-ounits/blob/stable-v2/manifest-entry.xsd',
+            'courses' =>
+'https://github.com/erasmus-without-paper/ewp-specs-api-courses/blob/stable-v1/manifest-entry.xsd',
+            'simple-course-replication' =>
+'https://github.com/erasmus-without-paper/ewp-specs-api-course-replication/blob/stable-v1/manifest-entry.xsd'
         );
 
         my %endpoints = ();
 
-        foreach my $apiName (keys %apis2namespaces) {
+        foreach my $apiName ( keys %apis2namespaces ) {
             my $endpoint = $self->_getEndpoint(
-                xpc   => $xpc,
-                heiId => $heiId,
-                name => $apiName,
+                xpc       => $xpc,
+                heiId     => $heiId,
+                name      => $apiName,
                 namespace => $apis2namespaces{$apiName}
             );
             if ($endpoint) {
@@ -141,15 +145,17 @@ sub _getEndpoint {
     my $xpc   = $params{xpc} || die 'Mandatory parameter "xpc" not inserted!';
     my $heiId = $params{heiId}
       || die 'Mandatory parameter "heiId" not inserted!';
-    my $name  = $params{name} || die 'Mandatory parameter "name" not inserted!';
-    my $ns    = $params{namespace} || die 'Mandatory parameter "namespace" not inserted!';
+    my $name = $params{name} || die 'Mandatory parameter "name" not inserted!';
+    my $ns   = $params{namespace}
+      || die 'Mandatory parameter "namespace" not inserted!';
 
-    $xpc->registerNs( 'ns', $ns);
+    $xpc->registerNs( 'ns', $ns );
 
     my @instAPIs =
       $xpc->findnodes( '//c:hei-id[text()="'
           . $heiId
-          . '"]/../../c:apis-implemented/ns:' . $name );
+          . '"]/../../c:apis-implemented/ns:'
+          . $name );
 
     return if !@instAPIs;
 
@@ -160,6 +166,23 @@ sub _getEndpoint {
     my $url = $xpc->findvalue( './ns:url[text()]', $instAPI );
 
     return $url;
+}
+
+=head2 C<parseInstitutionsXML ( xml : Str ) : Entity::Institution>
+
+Na vstupu bere string s XML souborem s informacemi o instituci. Vraci objekt tridy Institution.
+
+=cut
+
+sub parseInstitutionsXML {
+    my $self = shift;
+    my $xml  = shift;
+
+    my $instObject = Entity::Institution->new();
+
+    # TODO
+
+    return $instObject;
 }
 
 no Moose;
