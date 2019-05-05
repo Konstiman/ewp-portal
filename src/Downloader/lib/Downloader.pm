@@ -186,62 +186,93 @@ sub parseInstitutionsXML {
 
     #warn $dom->toString(1);
 
-    $xpc->registerNs( 'in', 'https://github.com/erasmus-without-paper/ewp-specs-api-institutions/tree/stable-v2' );
+    $xpc->registerNs( 'in',
+'https://github.com/erasmus-without-paper/ewp-specs-api-institutions/tree/stable-v2'
+    );
 
-    my $heiElement = ( $xpc->findnodes( '//in:hei' ) )[ 0 ];
+    my $heiElement = ( $xpc->findnodes('//in:hei') )[0];
 
     my $identifier = $xpc->findvalue( './in:hei-id[text()]', $heiElement );
-    if ( $identifier ) {
-        $instObject->identifier( $identifier );
+    if ($identifier) {
+        $instObject->identifier($identifier);
     }
 
     my @otherIds = $xpc->findnodes( './in:other-id', $heiElement );
     foreach my $otherIdElem (@otherIds) {
         my $id   = $otherIdElem->textContent;
         my $type = $otherIdElem->getAttribute('type') || 'unknown';
-        $instObject->setOtherIdentifier($type, $id);
+        $instObject->setOtherIdentifier( $type, $id );
     }
 
     my @names = $xpc->findnodes( './in:name', $heiElement );
     foreach my $nameElem (@names) {
         my $name = $nameElem->textContent;
         my $lang = $nameElem->getAttribute('xml:lang') || 'unknown';
-        $instObject->setName($lang, $name);
+        $instObject->setName( $lang, $name );
     }
 
-    my $abbreviation = $xpc->findvalue( './in:abbreviation[text()]', $heiElement );
-    if ( $abbreviation ) {
-        $instObject->abbreviation( $abbreviation );
+    my $abbreviation =
+      $xpc->findvalue( './in:abbreviation[text()]', $heiElement );
+    if ($abbreviation) {
+        $instObject->abbreviation($abbreviation);
     }
 
-    # TODO street address
+    $xpc->registerNs( 'a',
+'https://github.com/erasmus-without-paper/ewp-specs-types-address/tree/stable-v1'
+    );
+    my $streetAddressElem =
+      ( $xpc->findnodes( './a:street-address', $heiElement ) )[0];
+    if ($streetAddressElem) {
+        my $addressObject = $self->_parseAddressXML(
+            xpc            => $xpc,
+            addressElement => $streetAddressElem
+        );
+        $instObject->locationAddress($addressObject) if $addressObject;
+    }
 
-    # TODO mailing address
+    my $mailAddressElem =
+      ( $xpc->findnodes( './a:mailing-address', $heiElement ) )[0];
+    if ($mailAddressElem) {
+        my $addressObject = $self->_parseAddressXML(
+            xpc            => $xpc,
+            addressElement => $mailAddressElem
+        );
+        $instObject->mailingAddress($addressObject) if $addressObject;
+    }
 
     my @webs = $xpc->findnodes( './in:website-url', $heiElement );
     foreach my $webElem (@webs) {
         my $web  = $webElem->textContent;
         my $lang = $webElem->getAttribute('xml:lang') || 'unknown';
-        $instObject->setWebsite($web, $lang);
+        $instObject->setWebsite( $web, $lang );
     }
 
     my $logoUrl = $xpc->findvalue( './in:logo-url[text()]', $heiElement );
-    if ( $logoUrl ) {
-        $instObject->logoUrl( $logoUrl );
+    if ($logoUrl) {
+        $instObject->logoUrl($logoUrl);
     }
 
-    my @factsheets = $xpc->findnodes( './in:mobility-factsheet-url', $heiElement );
+    my @factsheets =
+      $xpc->findnodes( './in:mobility-factsheet-url', $heiElement );
     foreach my $factsheetElem (@factsheets) {
         my $url  = $factsheetElem->textContent;
         my $lang = $factsheetElem->getAttribute('xml:lang') || 'unknown';
-        $instObject->setFactsheet($url, $lang);
+        $instObject->setFactsheet( $url, $lang );
     }
 
-    # TODO contacts
+    $xpc->registerNs( 'c',
+'https://github.com/erasmus-without-paper/ewp-specs-types-contact/tree/stable-v1'
+    );
+    my @contacts = $xpc->findnodes( './c:contact', $heiElement );
+    foreach my $contactElement (@contacts) {
+        my $contactObject = $self->_parseContactXML( xpc => $xpc, contactElement => $contactElement );
+        $instObject->addContact($contactObject) if $contactObject;
+    }
 
-    my $rootUnitId = $xpc->findvalue( './in:root-ounit-id[text()]', $heiElement );
-    if ( $rootUnitId ) {
-        $instObject->rootUnitId( $rootUnitId );
+    my $rootUnitId =
+      $xpc->findvalue( './in:root-ounit-id[text()]', $heiElement );
+    if ($rootUnitId) {
+        $instObject->rootUnitId($rootUnitId);
     }
 
     my @unitIds = $xpc->findnodes( './in:ounit-id', $heiElement );
@@ -251,6 +282,32 @@ sub parseInstitutionsXML {
     }
 
     return $instObject;
+}
+
+sub _parseAddressXML {
+    my $self   = shift;
+    my %params = @_;
+
+    my $xpc = $params{xpc} || die 'Mandatory parameter "xpc" not inserted!';
+    my $addressElement = $params{addressElement}
+      || die 'Mandatory parameter "addressElement" not inserted!';
+
+    # TODO
+
+    return undef;
+}
+
+sub _parseContactXML {
+    my $self   = shift;
+    my %params = @_;
+
+    my $xpc = $params{xpc} || die 'Mandatory parameter "xpc" not inserted!';
+    my $contactElement = $params{contactElement}
+      || die 'Mandatory parameter "contactElement" not inserted!';
+
+    # TODO
+
+    return undef;
 }
 
 no Moose;
