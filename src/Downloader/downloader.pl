@@ -37,6 +37,7 @@ foreach my $heiId ( keys %$heis2endpoints ) {
         }
 		my $institutionObject = $downloader->parseInstitutionsXML($xml);
 		# TODO ulozit objekt pomoci manazera
+		warn Dumper $institutionObject;
     }
     else {
         # pokud nejsou ani zakladni informace o univerzite, nema cenu pokracovat

@@ -181,7 +181,74 @@ sub parseInstitutionsXML {
 
     my $instObject = Entity::Institution->new();
 
-    # TODO
+    my $dom = XML::LibXML->load_xml( string => $xml );
+    my $xpc = new XML::LibXML::XPathContext($dom);
+
+    #warn $dom->toString(1);
+
+    $xpc->registerNs( 'in', 'https://github.com/erasmus-without-paper/ewp-specs-api-institutions/tree/stable-v2' );
+
+    my $heiElement = ( $xpc->findnodes( '//in:hei' ) )[ 0 ];
+
+    my $identifier = $xpc->findvalue( './in:hei-id[text()]', $heiElement );
+    if ( $identifier ) {
+        $instObject->identifier( $identifier );
+    }
+
+    my @otherIds = $xpc->findnodes( './in:other-id', $heiElement );
+    foreach my $otherIdElem (@otherIds) {
+        my $id   = $otherIdElem->textContent;
+        my $type = $otherIdElem->getAttribute('type') || 'unknown';
+        $instObject->setOtherIdentifier($type, $id);
+    }
+
+    my @names = $xpc->findnodes( './in:name', $heiElement );
+    foreach my $nameElem (@names) {
+        my $name = $nameElem->textContent;
+        my $lang = $nameElem->getAttribute('xml:lang') || 'unknown';
+        $instObject->setName($lang, $name);
+    }
+
+    my $abbreviation = $xpc->findvalue( './in:abbreviation[text()]', $heiElement );
+    if ( $abbreviation ) {
+        $instObject->abbreviation( $abbreviation );
+    }
+
+    # TODO street address
+
+    # TODO mailing address
+
+    my @webs = $xpc->findnodes( './in:website-url', $heiElement );
+    foreach my $webElem (@webs) {
+        my $web  = $webElem->textContent;
+        my $lang = $webElem->getAttribute('xml:lang') || 'unknown';
+        $instObject->setWebsite($web, $lang);
+    }
+
+    my $logoUrl = $xpc->findvalue( './in:logo-url[text()]', $heiElement );
+    if ( $logoUrl ) {
+        $instObject->logoUrl( $logoUrl );
+    }
+
+    my @factsheets = $xpc->findnodes( './in:mobility-factsheet-url', $heiElement );
+    foreach my $factsheetElem (@factsheets) {
+        my $url  = $factsheetElem->textContent;
+        my $lang = $factsheetElem->getAttribute('xml:lang') || 'unknown';
+        $instObject->setFactsheet($url, $lang);
+    }
+
+    # TODO contacts
+
+    my $rootUnitId = $xpc->findvalue( './in:root-ounit-id[text()]', $heiElement );
+    if ( $rootUnitId ) {
+        $instObject->rootUnitId( $rootUnitId );
+    }
+
+    my @unitIds = $xpc->findnodes( './in:ounit-id', $heiElement );
+    foreach my $idElem (@unitIds) {
+        my $id = $idElem->textContent;
+        $instObject->addUnitId($id);
+    }
 
     return $instObject;
 }

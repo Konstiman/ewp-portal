@@ -18,7 +18,7 @@ has 'otherIdentifiers' => (
     traits => ['Hash'],
     default => sub { { } },
     handles => {
-        setOtherIdentifier => set
+        setOtherIdentifier => 'set'
     }
 );
 
@@ -28,7 +28,7 @@ has 'names' => (
     traits => ['Hash'],
     default => sub { { } },
     handles => {
-        setName => set
+        setName => 'set'
     }
 );
 
@@ -48,7 +48,7 @@ has 'websites' => (
     traits => ['Hash'],
     default => sub { { } },
     handles => {
-        setWebsite => set
+        setWebsite => 'set'
     }
 );
 
@@ -58,7 +58,7 @@ has 'factsheets' => (
     traits => ['Hash'],
     default => sub { { } },
     handles => {
-        setFactsheet => set
+        setFactsheet => 'set'
     }
 );
 
@@ -81,7 +81,22 @@ has 'contacts' => (
     traits => ['Array'],
     default => sub { [ ] },
     handles => {
-        addContact => push
+        addContact => 'push'
+    }
+);
+
+has 'rootUnitId' => (
+    is => 'rw',
+    isa => 'Str'
+);
+
+has 'unitIds' => (
+	is => 'rw',
+    isa => 'ArrayRef[Str]',
+    traits => ['Array'],
+    default => sub { [ ] },
+    handles => {
+        addUnitId => 'push'
     }
 );
 
