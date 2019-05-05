@@ -3,6 +3,7 @@ package Downloader;
 use Moose;
 use Moose::Util::TypeConstraints;
 
+use Entity::Institution;
 use HTTP::Request;
 use LWP::UserAgent;
 use XML::LibXML;
