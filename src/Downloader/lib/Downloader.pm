@@ -3,9 +3,11 @@ package Downloader;
 use Moose;
 use Moose::Util::TypeConstraints;
 
+use DBI;
 use Entity::Institution;
 use HTTP::Request;
 use LWP::UserAgent;
+use Manager::EntityManager;
 use XML::LibXML;
 use XML::LibXML::PrettyPrint;
 
@@ -265,7 +267,10 @@ sub parseInstitutionsXML {
     );
     my @contacts = $xpc->findnodes( './c:contact', $heiElement );
     foreach my $contactElement (@contacts) {
-        my $contactObject = $self->_parseContactXML( xpc => $xpc, contactElement => $contactElement );
+        my $contactObject = $self->_parseContactXML(
+            xpc            => $xpc,
+            contactElement => $contactElement
+        );
         $instObject->addContact($contactObject) if $contactObject;
     }
 
@@ -308,6 +313,28 @@ sub _parseContactXML {
     # TODO
 
     return undef;
+}
+
+# TODO dokumentace
+sub getInstitutionFromEndpoint {
+    my $self   = shift;
+    my %params = @_;
+
+    my $endpoint = $params{ endpoint } || die 'Mandatory parameter "endpoint" not inserted!';
+    my $heiId    = $params{ heiId }    || die 'Mandatory parameter "heiId" not inserted!';
+
+    my $xml = $self->downloadXML(
+        $endpoint . '?hei_id=' . $heiId 
+    );
+
+    if (!$xml) {
+        print $self->statusLine . "\n";
+        return undef;
+    }
+
+    my $institutionObject = $self->parseInstitutionsXML($xml);
+
+    return $institutionObject;
 }
 
 no Moose;
