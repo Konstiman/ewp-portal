@@ -64,7 +64,7 @@ sub downloadXML {
         agent      => 'EWP_Catalogue_Downloader/' . VERSION,
         cookie_jar => {}
     );
-    $agent->timeout(5000);
+    $agent->timeout(10);
 
     my $request = HTTP::Request->new( GET => $url );
 
