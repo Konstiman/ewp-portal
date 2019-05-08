@@ -33,25 +33,24 @@ foreach my $heiId ( keys %$heis2endpoints ) {
 
     my $endpoints = $heis2endpoints->{$heiId};
 
-    my $institutionId = '';
+    my $institutionObject = undef;
 
     if ( $endpoints->{'institutions'} ) {
 
-        my $institutionObject = $downloader->getInstitutionFromEndpoint( 
+        $institutionObject = $downloader->getInstitutionFromEndpoint( 
             endpoint => $endpoints->{'institutions'},
             heiId    => $heiId
         );
 
         if ( $institutionObject ) {
-            warn Dumper $institutionObject;
             ++$statsDownloaded;
             if ( $manager->saveInstitution( $institutionObject ) ) {
                 ++$statsSaved;
-                $institutionId = $manager->getLastInsertedId();
             }
             else {
                 ++$statsUnsaved;
             }
+            warn Dumper $institutionObject;
         }
         else {
             ++$statsSkipped;
@@ -67,4 +66,7 @@ foreach my $heiId ( keys %$heis2endpoints ) {
 print "
 downloaded: $statsDownloaded
 skipped:    $statsSkipped
+
+saved:      $statsSaved
+unsaved:    $statsUnsaved
 ";

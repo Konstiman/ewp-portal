@@ -300,18 +300,21 @@ sub _parseAddressXML {
 
     my $addressObject = Entity::Address->new();
 
-    my @lines = ();
+    my $recipient = '';
     my @recipientNames = $xpc->findnodes( 'a:recipientName', $addressElement );
     foreach my $name ( @recipientNames ) {
-        push @lines, $name->textContent();
+        $recipient .= ( $recipient ? "\n" : '' ) . $name->textContent();
     }
 
+    $addressObject->recipient( $recipient ) if $recipient;
+
+    my $lines = '';
     my @addressLines = $xpc->findnodes( 'a:addressLine', $addressElement );
     foreach my $line ( @addressLines ) {
-        push @lines, $line->textContent();
+        $lines .= ( $lines ? "\n" : '' ) . $line->textContent();
     }
 
-    $addressObject->lines( \@lines );
+    $addressObject->lines( $lines ) if $lines;
 
     my $buildingNumber = ( $xpc->findnodes( 'a:buildingNumber', $addressElement ) )[ 0 ];
     my $buildingName   = ( $xpc->findnodes( 'a:buildingName', $addressElement ) )[ 0 ];

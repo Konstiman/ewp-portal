@@ -7,9 +7,14 @@ has 'id' => (
     isa => 'Int'
 );
 
+has 'recipient' => (
+    is => 'rw',
+    isa => 'Str'
+);
+
 has 'lines' => (
     is => 'rw',
-    isa => 'ArrayRef[Str]'
+    isa => 'Str'
 );
 
 has 'buildingNumber' => (
