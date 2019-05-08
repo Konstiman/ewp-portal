@@ -70,3 +70,5 @@ skipped:    $statsSkipped
 saved:      $statsSaved
 unsaved:    $statsUnsaved
 ";
+
+$dbh->disconnect();

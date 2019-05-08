@@ -15,7 +15,13 @@ has 'dbh' => (
 sub clearDatabase {
     my $self = shift;
 
+    $self->dbh->do( 'DELETE FROM institution_name' );
+    $self->dbh->do( 'DELETE FROM institution_website' );
+    $self->dbh->do( 'DELETE FROM institution_factsheet' );
+    $self->dbh->do( 'DELETE FROM institution_other_id' );
+    $self->dbh->do( 'DELETE FROM institution_contact' );
     $self->dbh->do( 'DELETE FROM institution' );
+    $self->dbh->do( 'DELETE FROM contact' );
     $self->dbh->do( 'DELETE FROM address' );
 
     # TODO mazat vsechno (ve spravnem poradi!)
@@ -129,15 +135,147 @@ sub saveInstitution {
         ( $institution->mailingAddress ? $institution->mailingAddress->id : undef )
     );
 
+    if ( !$res ) {
+        # TODO
+        warn "execution failed:" . $self->dbh->errstr();
+
+        return 0;
+    }
+
+    $institution->id($self->dbh->{mysql_insertid});
+
+    my $langMap = $self->_getLangMap();
+
+    if ($institution->otherIdentifiers) {
+        foreach my $type (keys %{ $institution->otherIdentifiers }) {
+            my $res = $self->dbh->do(
+                'INSERT INTO institution_other_id (institution, identifier, type) VALUES (?,?,?)',
+                undef,
+                $institution->id,
+                $institution->otherIdentifiers->{ $type },
+                lc $type
+            );
+
+            # TODO
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ($institution->names) {
+        foreach my $lang (keys %{ $institution->names }) {
+            my $langId = undef;
+            if ($lang ne 'unknown') {
+                $langId = $langMap->{ lc $lang };
+                $langId = $self->_saveLanguage($lang) if !$langId;
+            }
+            
+            my $res = $self->dbh->do(
+                'INSERT INTO institution_name (institution, name, language) VALUES (?,?,?)',
+                undef,
+                $institution->id,
+                $institution->names->{ $lang },
+                $langId
+            );
+
+            # TODO
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ($institution->websites) {
+        foreach my $url (keys %{ $institution->websites }) {
+            my $lang = $institution->websites->{ $url };
+            my $langId = undef;
+            if ($lang ne 'unknown') {
+                $langId = $langMap->{ lc $lang };
+                $langId = $self->_saveLanguage($lang) if !$langId;
+            }
+            
+            my $res = $self->dbh->do(
+                'INSERT INTO institution_website (institution, url, language) VALUES (?,?,?)',
+                undef,
+                $institution->id,
+                $url,
+                $langId
+            );
+
+            # TODO
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ($institution->factsheets) {
+        foreach my $url (keys %{ $institution->factsheets }) {
+            my $lang = $institution->factsheets->{ $url };
+            my $langId = undef;
+            if ($lang ne 'unknown') {
+                $langId = $langMap->{ lc $lang };
+                $langId = $self->_saveLanguage($lang) if !$langId;
+            }
+            
+            my $res = $self->dbh->do(
+                'INSERT INTO institution_factsheet (institution, name, url, language) VALUES (?,?,?,?)',
+                undef,
+                $institution->id,
+                'Factsheet' . ( $lang ne 'unknown' ? ' (' . uc $lang . ')' : '' ), 
+                $url,
+                $langId
+            );
+
+            # TODO
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+        
+    return $institution;
+}
+
+sub _getLangMap {
+    my $self = shift;
+
+    # TODO cachovat
+
+    my $sth = $self->dbh->prepare('SELECT id, abbreviation FROM language');
+
+    if (!$sth) {
+        warn "prepare statement failed: " . $self->dbh->errstr();
+        return {};
+    }
+
+    if (!$sth->execute()) {
+        warn "execution failed: " . $self->dbh->errstr();
+        return {};
+    }
+
+    my %map = ();
+    while (my $ref = $sth->fetchrow_hashref()) {
+        $map{ $ref->{ 'abbreviation' } } = $ref->{ 'id' };
+    }
+    $sth->finish();
+
+    return \%map;
+}
+
+sub _saveLanguage {
+    my $self = shift;
+    my $lang = shift;
+
+    $lang = lc $lang;
+
+    my $res = $self->dbh->do(
+        'INSERT INTO language (abbreviation, name) VALUES (?, \'\')',
+        undef,
+        $lang
+    );
+
     if ( $res ) {
-        $institution->id($self->dbh->{mysql_insertid});
-        return $institution;
+        return $self->dbh->{mysql_insertid};
     }
 
     # TODO
     warn "execution failed:" . $self->dbh->errstr();
 
-    return 0;
+    return undef;
 }
 
 no Moose;
