@@ -1,6 +1,15 @@
 package Entity::Contact;
  
 use Moose;
+use namespace::autoclean;
+
+=pod
+
+=head1 DESCRIPTION
+
+Entita reprezentujici kontakt v siti EWP.
+
+=cut
 
 has 'id' => (
 	is => 'rw',

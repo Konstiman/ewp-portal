@@ -12,8 +12,7 @@ my $downloader = Downloader->new();
 my $xml = $downloader->downloadCatalogue();
 
 if ( !$xml ) {
-    die 'Catalogue download failed'
-      . ( $downloader->statusLine() ? ': ' . $downloader->statusLine() : '.' );
+    die 'Catalogue download failed' . ( $downloader->statusLine() ? ': ' . $downloader->statusLine() : '.' );
 }
 
 my $heis2endpoints = $downloader->parseCatalogueXML($xml);
@@ -28,7 +27,7 @@ my $manager = Manager::EntityManager->new( dbh => $dbh );
 $manager->clearDatabase();
 
 foreach my $heiId ( keys %$heis2endpoints ) {
-    # TODO oddelat
+
     #next if $heiId ne 'uw.edu.pl';
 
     my $endpoints = $heis2endpoints->{$heiId};
@@ -37,31 +36,42 @@ foreach my $heiId ( keys %$heis2endpoints ) {
 
     if ( $endpoints->{'institutions'} ) {
 
-        $institutionObject = $downloader->getInstitutionFromEndpoint( 
-            endpoint => $endpoints->{'institutions'},
-            heiId    => $heiId
-        );
+        $institutionObject = $downloader->getInstitutionFromEndpoint( $endpoints->{'institutions'}, $heiId );
 
-        if ( $institutionObject ) {
+        if ($institutionObject) {
             ++$statsDownloaded;
-            if ( $manager->saveInstitution( $institutionObject ) ) {
+            if ( $manager->saveInstitution($institutionObject) ) {
                 ++$statsSaved;
             }
-            else {
-                ++$statsUnsaved;
-            }
-            warn Dumper $institutionObject;
+
+            # TODO
+            #warn Dumper $institutionObject;
         }
-        else {
-            ++$statsSkipped;
-        }
+        print $downloader->statusLine . "\n" if $downloader->statusLine;
     }
     else {
-        # pokud nejsou ani zakladni informace o univerzite, nema cenu pokracovat
-        ++$statsSkipped;
+        # pokud neni institutions api, nema cenu pokracovat dal
+        # TODO ale prece jenom vyzkouset
         next;
     }
+
+    if ( $endpoints->{'organizational-units'} ) {
+        # TODO stazeni org. units
+    }
+
+    if ( $endpoints->{'simple-course-replication'} ) {
+        # TODO priprava pro courses
+    }
+
+    if ( $endpoints->{'courses'} ) {
+        # TODO stazeni courses
+    }
 }
+
+$dbh->disconnect();
+
+$statsSkipped = scalar( keys %{ $heis2endpoints } ) - $statsDownloaded;
+$statsUnsaved = $statsDownloaded - $statsSaved;
 
 print "
 downloaded: $statsDownloaded
@@ -70,5 +80,3 @@ skipped:    $statsSkipped
 saved:      $statsSaved
 unsaved:    $statsUnsaved
 ";
-
-$dbh->disconnect();

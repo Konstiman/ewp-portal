@@ -1,6 +1,13 @@
 package Entity::Institution;
  
 use Moose;
+use namespace::autoclean;
+
+=head1 DESCRIPTION
+
+Entita reprezentujici instituci (HEI) v siti EWP.
+
+=cut
 
 has 'id' => (
 	is => 'rw',

@@ -1,6 +1,13 @@
 package Entity::Address;
  
 use Moose;
+use namespace::autoclean;
+
+=head1 DESCRIPTION
+
+Entita reprezentujici adresu v siti EWP.
+
+=cut
 
 has 'id' => (
 	is => 'rw',

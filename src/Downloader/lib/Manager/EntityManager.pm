@@ -1,6 +1,13 @@
 package Manager::EntityManager;
 
 use Moose;
+use namespace::autoclean;
+
+=head1 DESCRIPTION
+
+TODO dokumentace
+
+=cut
 
 use Entity::Institution;
 
@@ -10,7 +17,13 @@ has 'dbh' => (
     required => 1
 );
 
-# TODO dokumentace
+=head1 METHODS
+
+=head2 C<clearDatabase () : None>
+
+Smaze obsah neciselnikovych tabulek v db.
+
+=cut
 
 sub clearDatabase {
     my $self = shift;
@@ -31,6 +44,14 @@ sub clearDatabase {
 
     # TODO mazat vsechno (ve spravnem poradi!)
 }
+
+=head2 C<getCountryId ( code : Str ) : Int>
+
+Vraci id zeme podle kodu, pokud je zeme s timto kodem ulozena v databazi.
+
+Hleda v tabulce `country`.
+
+=cut
 
 sub getCountryId {
     my $self = shift;
@@ -60,31 +81,41 @@ sub getCountryId {
     return undef;
 }
 
+=head2 C<saveCountryCode ( code : Str ) : Int>
+
+Ulozi kod zeme do databaze do tabulky `country`. Vraci id nove vlozeneho zaznamu.
+
+=cut
+
 sub saveCountryCode {
     my $self = shift;
     my $code = shift;
 
     $code = uc $code;
 
-    my $res =
-      $self->dbh->do( 'INSERT INTO country (code) VALUES (?)', undef, $code );
+    my $res = $self->dbh->do( 'INSERT INTO country (code) VALUES (?)', undef, $code );
 
     if ($res) {
         return $self->dbh->{mysql_insertid};
     }
 
-    # TODO
     warn "execution failed:" . $self->dbh->errstr();
 
     return undef;
 }
+
+=head2 C<saveAddress ( address : Entity::Address ) : Entity::Address>
+
+Ulozi objekt adresy do databaze do tabulky `address`. Objektu nastavi id nove vlozeneho zaznamu.
+
+=cut
 
 sub saveAddress {
     my $self    = shift;
     my $address = shift;
 
     my $countryId = undef;
-    
+
     if ( $address->country ) {
         $countryId = $self->getCountryId( $address->country );
         if ( !$countryId ) {
@@ -94,7 +125,8 @@ sub saveAddress {
 
     my $res = $self->dbh->do(
         'INSERT INTO address 
-        (recipient, addressLines, buildingNumber, buildingName, streetName, unit, floor, pobox, deliveryPoint, postalCode, locality, region, country) 
+        (recipient, addressLines, buildingNumber, buildingName, streetName, unit, 
+        floor, pobox, deliveryPoint, postalCode, locality, region, country) 
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
         undef,
         $address->recipient,
@@ -117,11 +149,18 @@ sub saveAddress {
         return $address;
     }
 
-    # TODO
     warn "execution failed:" . $self->dbh->errstr();
 
-    return 0;
+    return undef;
 }
+
+=head2 C<saveInstitution ( institution : Entity::Institution ) : Entity::Institution>
+
+Ulozi objekt instituce do databaze do tabulky `institution` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.
+
+TODO refaktorovat do vice mensich metod.
+
+=cut
 
 sub saveInstitution {
     my $self        = shift;
@@ -135,27 +174,11 @@ sub saveInstitution {
         $self->saveAddress( $institution->mailingAddress );
     }
 
-    my $res = $self->dbh->do(
-'INSERT INTO institution (identifier, abbreviation, logo_url, location_address, mailing_address) VALUES (?,?,?,?,?)',
-        undef,
-        $institution->identifier,
-        $institution->abbreviation,
-        $institution->logoUrl,
-        (
-            $institution->locationAddress ? $institution->locationAddress->id
-            : undef
-        ),
-        (
-            $institution->mailingAddress ? $institution->mailingAddress->id
-            : undef
-        )
-    );
+    my $res = $self->dbh->do( 'INSERT INTO institution (identifier, abbreviation, logo_url, location_address, mailing_address) VALUES (?,?,?,?,?)', undef, $institution->identifier, $institution->abbreviation, $institution->logoUrl, ( $institution->locationAddress ? $institution->locationAddress->id : undef ), ( $institution->mailingAddress ? $institution->mailingAddress->id : undef ) );
 
     if ( !$res ) {
 
-        # TODO
         warn "execution failed:" . $self->dbh->errstr();
-
         return 0;
     }
 
@@ -165,15 +188,8 @@ sub saveInstitution {
 
     if ( $institution->otherIdentifiers ) {
         foreach my $type ( keys %{ $institution->otherIdentifiers } ) {
-            my $res = $self->dbh->do(
-'INSERT INTO institution_other_id (institution, identifier, type) VALUES (?,?,?)',
-                undef,
-                $institution->id,
-                $institution->otherIdentifiers->{$type},
-                lc $type
-            );
+            my $res = $self->dbh->do( 'INSERT INTO institution_other_id (institution, identifier, type) VALUES (?,?,?)', undef, $institution->id, $institution->otherIdentifiers->{$type}, lc $type );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
@@ -189,15 +205,8 @@ sub saveInstitution {
                 }
             }
 
-            my $res = $self->dbh->do(
-'INSERT INTO institution_name (institution, name, language) VALUES (?,?,?)',
-                undef,
-                $institution->id,
-                $institution->names->{$lang},
-                $langId
-            );
+            my $res = $self->dbh->do( 'INSERT INTO institution_name (institution, name, language) VALUES (?,?,?)', undef, $institution->id, $institution->names->{$lang}, $langId );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
@@ -214,12 +223,8 @@ sub saveInstitution {
                 }
             }
 
-            my $res = $self->dbh->do(
-'INSERT INTO institution_website (institution, url, language) VALUES (?,?,?)',
-                undef, $institution->id, $url, $langId
-            );
+            my $res = $self->dbh->do( 'INSERT INTO institution_website (institution, url, language) VALUES (?,?,?)', undef, $institution->id, $url, $langId );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
@@ -236,17 +241,8 @@ sub saveInstitution {
                 }
             }
 
-            my $res = $self->dbh->do(
-'INSERT INTO institution_factsheet (institution, name, url, language) VALUES (?,?,?,?)',
-                undef,
-                $institution->id,
-                'Factsheet'
-                  . ( $lang ne 'unknown' ? ' (' . uc $lang . ')' : '' ),
-                $url,
-                $langId
-            );
+            my $res = $self->dbh->do( 'INSERT INTO institution_factsheet (institution, name, url, language) VALUES (?,?,?,?)', undef, $institution->id, 'Factsheet' . ( $lang ne 'unknown' ? ' (' . uc $lang . ')' : '' ), $url, $langId );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
@@ -255,12 +251,8 @@ sub saveInstitution {
         foreach my $contactObject ( @{ $institution->contacts } ) {
             $self->saveContact($contactObject);
             if ( $contactObject->id ) {
-                my $res = $self->dbh->do(
-'INSERT INTO institution_contact (institution, contact) VALUES (?,?)',
-                    undef, $institution->id, $contactObject->id
-                );
+                my $res = $self->dbh->do( 'INSERT INTO institution_contact (institution, contact) VALUES (?,?)', undef, $institution->id, $contactObject->id );
 
-                # TODO
                 warn "execution failed:" . $self->dbh->errstr() if !$res;
             }
         }
@@ -268,6 +260,14 @@ sub saveInstitution {
 
     return $institution;
 }
+
+=head2 C<saveContact ( contact : Entity::Contact ) : Entity::Contact>
+
+Ulozi objekt kontaktu do databaze do tabulky `contact` a navazujicich podtabulek. Objektu nastavi id nove vlozeneho zaznamu.
+
+TODO refaktorovat do vice mensich metod.
+
+=cut
 
 sub saveContact {
     my $self    = shift;
@@ -284,7 +284,7 @@ sub saveContact {
     }
 
     my $res = $self->dbh->do(
-'INSERT INTO contact (gender, location_address, mailing_address) VALUES (?,?,?)',
+        'INSERT INTO contact (gender, location_address, mailing_address) VALUES (?,?,?)',
         undef,
         $contact->gender,
         (
@@ -299,9 +299,7 @@ sub saveContact {
 
     if ( !$res ) {
 
-        # TODO
         warn "execution failed:" . $self->dbh->errstr();
-
         return 0;
     }
 
@@ -320,58 +318,32 @@ sub saveContact {
                 }
             }
 
-            my $res = $self->dbh->do(
-'INSERT INTO contact_name (contact, name, language, type) VALUES (?,?,?,?)',
-                undef,
-                $contact->id,
-                $contact->names->{$lang},
-                $langId,
-                'contact-name'
-            );
+            my $res = $self->dbh->do( 'INSERT INTO contact_name (contact, name, language, type) VALUES (?,?,?,?)', undef, $contact->id, $contact->names->{$lang}, $langId, 'contact-name' );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
 
     if ( $contact->emails ) {
-        foreach my $email (@{ $contact->emails }) {
-            my $res = $self->dbh->do(
-'INSERT INTO contact_email (contact, email) VALUES (?,?)',
-                undef,
-                $contact->id,
-                $email
-            );
+        foreach my $email ( @{ $contact->emails } ) {
+            my $res = $self->dbh->do( 'INSERT INTO contact_email (contact, email) VALUES (?,?)', undef, $contact->id, $email );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
 
     if ( $contact->phones ) {
-        foreach my $phone (@{ $contact->phones }) {
-            my $res = $self->dbh->do(
-'INSERT INTO contact_phone (contact, phoneNumber) VALUES (?,?)',
-                undef,
-                $contact->id,
-                $phone
-            );
+        foreach my $phone ( @{ $contact->phones } ) {
+            my $res = $self->dbh->do( 'INSERT INTO contact_phone (contact, phoneNumber) VALUES (?,?)', undef, $contact->id, $phone );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
 
     if ( $contact->faxes ) {
-        foreach my $fax (@{ $contact->faxes }) {
-            my $res = $self->dbh->do(
-'INSERT INTO contact_fax (contact, faxNumber) VALUES (?,?)',
-                undef,
-                $contact->id,
-                $fax
-            );
+        foreach my $fax ( @{ $contact->faxes } ) {
+            my $res = $self->dbh->do( 'INSERT INTO contact_fax (contact, faxNumber) VALUES (?,?)', undef, $contact->id, $fax );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
@@ -387,15 +359,8 @@ sub saveContact {
                 }
             }
 
-            my $res = $self->dbh->do(
-'INSERT INTO contact_description (contact, text, language) VALUES (?,?,?)',
-                undef,
-                $contact->id,
-                $contact->description->{$lang},
-                $langId
-            );
+            my $res = $self->dbh->do( 'INSERT INTO contact_description (contact, text, language) VALUES (?,?,?)', undef, $contact->id, $contact->description->{$lang}, $langId );
 
-            # TODO
             warn "execution failed:" . $self->dbh->errstr() if !$res;
         }
     }
@@ -433,15 +398,12 @@ sub _saveLanguage {
 
     $lang = lc $lang;
 
-    my $res = $self->dbh->do(
-        'INSERT INTO language (abbreviation, name) VALUES (?, \'\')',
-        undef, $lang );
+    my $res = $self->dbh->do( 'INSERT INTO language (abbreviation, name) VALUES (?, \'\')', undef, $lang );
 
     if ($res) {
         return $self->dbh->{mysql_insertid};
     }
 
-    # TODO
     warn "execution failed:" . $self->dbh->errstr();
 
     return undef;
