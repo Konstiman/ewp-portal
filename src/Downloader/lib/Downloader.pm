@@ -297,9 +297,46 @@ sub _parseAddressXML {
     my $addressElement = $params{addressElement}
       || die 'Mandatory parameter "addressElement" not inserted!';
 
-    # TODO
+    my $addressObject = Entity::Address->new();
 
-    return undef;
+    my @lines = ();
+    my @recipientNames = $xpc->findnodes( 'a:recipientName', $addressElement );
+    foreach my $name ( @recipientNames ) {
+        push @lines, $name->textContent();
+    }
+
+    my @addressLines = $xpc->findnodes( 'a:addressLine', $addressElement );
+    foreach my $line ( @addressLines ) {
+        push @lines, $line->textContent();
+    }
+
+    $addressObject->lines( \@lines );
+
+    my $buildingNumber = ( $xpc->findnodes( 'a:buildingNumber', $addressElement ) )[ 0 ];
+    my $buildingName   = ( $xpc->findnodes( 'a:buildingName', $addressElement ) )[ 0 ];
+    my $streetName     = ( $xpc->findnodes( 'a:streetName', $addressElement ) )[ 0 ];
+    my $unit           = ( $xpc->findnodes( 'a:unit', $addressElement ) )[ 0 ];
+    my $floor          = ( $xpc->findnodes( 'a:floor', $addressElement ) )[ 0 ];
+    my $pobox          = ( $xpc->findnodes( 'a:postOfficeBox', $addressElement ) )[ 0 ];
+    my $deliveryPoint  = ( $xpc->findnodes( 'a:deliveryPointCode', $addressElement ) )[ 0 ];
+    my $postalCode     = ( $xpc->findnodes( 'a:postalCode', $addressElement ) )[ 0 ];
+    my $locality       = ( $xpc->findnodes( 'a:locality', $addressElement ) )[ 0 ];
+    my $region         = ( $xpc->findnodes( 'a:region', $addressElement ) )[ 0 ];
+    my $country        = ( $xpc->findnodes( 'a:country', $addressElement ) )[ 0 ];
+
+    $addressObject->buildingNumber( $buildingNumber->textContent() ) if $buildingNumber;
+    $addressObject->buildingName( $buildingName->textContent() )     if $buildingName;
+    $addressObject->streetName( $streetName->textContent() )         if $streetName;
+    $addressObject->unit( $unit->textContent() )                     if $unit;
+    $addressObject->floor( $floor->textContent() )                   if $floor;
+    $addressObject->pobox( $pobox->textContent() )                   if $pobox;
+    $addressObject->deliveryPoint( $deliveryPoint->textContent() )   if $deliveryPoint;
+    $addressObject->postalCode( $postalCode->textContent() )         if $postalCode;
+    $addressObject->locality( $locality->textContent() )             if $locality;
+    $addressObject->region( $region->textContent() )                 if $region;
+    $addressObject->country( $country->textContent() )               if $country;
+
+    return $addressObject;
 }
 
 sub _parseContactXML {

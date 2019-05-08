@@ -38,6 +38,7 @@ foreach my $heiId ( keys %$heis2endpoints ) {
         );
 
         if ( $institutionObject ) {
+            warn Dumper $institutionObject;
             ++$statsDownloaded;
             if ( $manager->saveInstitution( $institutionObject ) ) {
                 ++$statsSaved;
