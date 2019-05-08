@@ -25,7 +25,12 @@ my $dbh = DBI->connect( $dsn, 'ewpportal', 'ewpportal' );
 
 my $manager = Manager::EntityManager->new( dbh => $dbh );
 
+$manager->clearDatabase();
+
 foreach my $heiId ( keys %$heis2endpoints ) {
+    # TODO oddelat
+    next if $heiId ne 'uw.edu.pl';
+
     my $endpoints = $heis2endpoints->{$heiId};
 
     my $institutionId = '';

@@ -10,7 +10,15 @@ has 'dbh' => (
     required => 1
 );
 
-# TODO
+# TODO dokumentace
+
+sub clearDatabase {
+    my $self = shift;
+
+    $self->dbh->do( 'DELETE FROM institution' );
+
+    # TODO mazat vsechno
+}
 
 sub saveInstitution {
     my $self        = shift;
