@@ -74,8 +74,7 @@ has 'locationAddress' => (
 
 has 'contacts' => (
 	is => 'rw',
-    # TODO pole objektu
-    isa => 'ArrayRef[Str]',
+    isa => 'ArrayRef[Object]',
     traits => ['Array'],
     default => sub { [ ] },
     handles => {

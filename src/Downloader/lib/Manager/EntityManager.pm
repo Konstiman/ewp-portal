@@ -21,6 +21,11 @@ sub clearDatabase {
     $self->dbh->do('DELETE FROM institution_other_id');
     $self->dbh->do('DELETE FROM institution_contact');
     $self->dbh->do('DELETE FROM institution');
+    $self->dbh->do('DELETE FROM contact_name');
+    $self->dbh->do('DELETE FROM contact_email');
+    $self->dbh->do('DELETE FROM contact_phone');
+    $self->dbh->do('DELETE FROM contact_fax');
+    $self->dbh->do('DELETE FROM contact_description');
     $self->dbh->do('DELETE FROM contact');
     $self->dbh->do('DELETE FROM address');
 
@@ -78,9 +83,13 @@ sub saveAddress {
     my $self    = shift;
     my $address = shift;
 
-    my $countryId = $self->getCountryId( $address->country );
-    if ( !$countryId ) {
-        $countryId = $self->saveCountryCode( $address->country );
+    my $countryId = undef;
+    
+    if ( $address->country ) {
+        $countryId = $self->getCountryId( $address->country );
+        if ( !$countryId ) {
+            $countryId = $self->saveCountryCode( $address->country );
+        }
     }
 
     my $res = $self->dbh->do(

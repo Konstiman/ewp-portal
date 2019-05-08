@@ -29,7 +29,7 @@ $manager->clearDatabase();
 
 foreach my $heiId ( keys %$heis2endpoints ) {
     # TODO oddelat
-    next if $heiId ne 'uw.edu.pl';
+    #next if $heiId ne 'uw.edu.pl';
 
     my $endpoints = $heis2endpoints->{$heiId};
 

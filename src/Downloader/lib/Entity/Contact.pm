@@ -1,4 +1,4 @@
-package Entity::Address;
+package Entity::Contact;
  
 use Moose;
 
@@ -9,17 +9,17 @@ has 'id' => (
 
 has 'names' => (
     is => 'rw',
-    isa => 'ArrayRef[Str]',
-    traits => ['Array'],
-    default => sub { [ ] },
+    isa => 'HashRef[Str]',
+    traits => ['Hash'],
+    default => sub { {} },
     handles => {
-        addName => 'push'
+        setName => 'set'
     }
 );
 
 # TODO given names and family names
 
-has => 'gender' => (
+has 'gender' => (
     is => 'rw',
     isa => 'Int'
 );

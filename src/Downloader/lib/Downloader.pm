@@ -5,6 +5,7 @@ use Moose::Util::TypeConstraints;
 
 use DBI;
 use Entity::Address;
+use Entity::Contact;
 use Entity::Institution;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -14,6 +15,11 @@ use XML::LibXML::PrettyPrint;
 
 use constant CATALOGUE_URL =>
   'https://registry.erasmuswithoutpaper.eu/catalogue-v1.xml';
+
+use constant DEV_CATALOGUE_URL =>
+  'https://dev-registry.erasmuswithoutpaper.eu/catalogue-v1.xml';
+
+use constant DEVEL_MODE => 1;
 
 use constant VERSION => '1.0.0';
 
@@ -48,6 +54,11 @@ Stahne XML katalog z adresy C<catalogueUrl>.
 
 sub downloadCatalogue {
     my $self = shift;
+
+    if (DEVEL_MODE) {
+        warn "DOWNLOADING DEVEL CATALOGUE!!!";
+        return $self->downloadXML(DEV_CATALOGUE_URL);
+    }
 
     return $self->downloadXML(CATALOGUE_URL);
 }
@@ -351,12 +362,14 @@ sub _parseContactXML {
     my $contactElement = $params{contactElement}
       || die 'Mandatory parameter "contactElement" not inserted!';
 
+    $xpc->registerNs( 'p', 'https://github.com/erasmus-without-paper/ewp-specs-types-phonenumber/tree/stable-v1' );
+
     my $contactObject = Entity::Contact->new();
 
-    # TODO podle jazyku
     my @names = $xpc->findnodes( "c:contact-name", $contactElement );
     foreach my $name ( @names ) {
-        $contactObject->addName( $name->textContent() );
+        my $lang = $name->getAttribute('xml:lang') || 'unknown';
+        $contactObject->setName( $lang, $name->textContent() );
     }
 
     # TODO vsecky jmena
