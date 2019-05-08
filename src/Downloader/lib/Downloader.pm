@@ -4,6 +4,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 
 use DBI;
+use Entity::Address;
 use Entity::Institution;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -347,9 +348,53 @@ sub _parseContactXML {
     my $contactElement = $params{contactElement}
       || die 'Mandatory parameter "contactElement" not inserted!';
 
-    # TODO
+    my $contactObject = Entity::Contact->new();
 
-    return undef;
+    # TODO podle jazyku
+    my @names = $xpc->findnodes( "c:contact-name", $contactElement );
+    foreach my $name ( @names ) {
+        $contactObject->addName( $name->textContent() );
+    }
+
+    # TODO vsecky jmena
+    # skipping given names & family names
+
+    my $gender = ( $xpc->findnodes( 'c:gender', $contactElement ) )[ 0 ];
+    if ($gender) {
+        $contactObject->gender( $gender->textContent() );
+    }
+
+    my @phones = $xpc->findnodes( "p:phone-number", $contactElement );
+    foreach my $phone ( @phones ) {
+        $contactObject->addPhone( $phone->textContent() );
+    }
+
+    my @faxes = $xpc->findnodes( "p:fax-number", $contactElement );
+    foreach my $fax ( @faxes ) {
+        $contactObject->addFax( $fax->textContent() );
+    }
+
+    my @emails = $xpc->findnodes( "c:email", $contactElement );
+    foreach my $email ( @emails ) {
+        $contactObject->addEmail( $email->textContent() );
+    }
+
+    my $locationAddress = ( $xpc->findnodes( 'a:street-address', $contactElement ) )[ 0 ];
+    if ( $locationAddress ) {
+        $contactObject->setAddress( 'street-address', $self->_parseAddressXML( addressElement => $locationAddress, xpc => $xpc ) );
+    }
+    my $mailingAddress = ( $xpc->findnodes( 'a:mailing-address', $contactElement ) )[ 0 ];
+    if ( $mailingAddress ) {
+        $contactObject->setAddress( 'mailing-address', $self->_parseAddressXML( addressElement => $mailingAddress, xpc => $xpc ) );
+    }
+
+    my @descs = $xpc->findnodes( "c:role-description", $contactElement );
+    foreach my $desc ( @descs ) {
+        my $lang = $desc->getAttribute('xml:lang') || 'unknown';
+        $contactObject->setDescription( $lang, $desc->textContent() );
+    }
+
+    return $contactObject;
 }
 
 # TODO dokumentace

@@ -64,14 +64,12 @@ has 'factsheets' => (
 
 has 'mailingAddress' => (
 	is => 'rw',
-    # TODO objekt
-    isa => 'Str'
+    isa => 'Object'
 );
 
 has 'locationAddress' => (
 	is => 'rw',
-    # TODO objekt
-    isa => 'Str'
+    isa => 'Object'
 );
 
 has 'contacts' => (
