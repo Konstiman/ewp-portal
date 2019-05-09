@@ -28,12 +28,20 @@ Smaze obsah neciselnikovych tabulek v db.
 sub clearDatabase {
     my $self = shift;
 
+    # unit
+    $self->dbh->do('DELETE FROM unit_name');
+    $self->dbh->do('DELETE FROM unit_website');
+    $self->dbh->do('DELETE FROM unit_factsheet');
+    $self->dbh->do('DELETE FROM unit_contact');
+    $self->dbh->do('DELETE FROM unit');
+    # institution
     $self->dbh->do('DELETE FROM institution_name');
     $self->dbh->do('DELETE FROM institution_website');
     $self->dbh->do('DELETE FROM institution_factsheet');
     $self->dbh->do('DELETE FROM institution_other_id');
     $self->dbh->do('DELETE FROM institution_contact');
     $self->dbh->do('DELETE FROM institution');
+    # common types
     $self->dbh->do('DELETE FROM contact_name');
     $self->dbh->do('DELETE FROM contact_email');
     $self->dbh->do('DELETE FROM contact_phone');
@@ -407,6 +415,130 @@ sub _saveLanguage {
     warn "execution failed:" . $self->dbh->errstr();
 
     return undef;
+}
+
+=head2 C<saveUnit ( unit : Entity::Unit ) : Entity::Unit>
+
+Ulozi objekt organizacni jednotky do databaze do tabulky `organizational_unit` a navazujicich tabulek. 
+Objektu nastavi id nove vlozeneho zaznamu.
+
+TODO refaktorovat do vice mensich metod.
+
+=cut
+
+sub saveUnit {
+    my $self = shift;
+    my $unit = shift;
+
+    if ( $unit->locationAddress ) {
+        $self->saveAddress( $unit->locationAddress );
+    }
+
+    if ( $unit->mailingAddress ) {
+        $self->saveAddress( $unit->mailingAddress );
+    }
+
+    # TODO root + parent
+    my $res = $self->dbh->do( 
+        'INSERT INTO unit (identifier, institution, code, abbreviation, logo_url, location_address, mailing_address) 
+        VALUES (?,?,?,?,?,?,?)', 
+        undef, 
+        $unit->identifier,
+        $unit->institution->id,
+        $unit->code,
+        $unit->abbreviation, 
+        $unit->logoUrl, 
+        ( $unit->locationAddress ? $unit->locationAddress->id : undef ), 
+        ( $unit->mailingAddress ? $unit->mailingAddress->id : undef ) 
+    );
+
+    if ( !$res ) {
+
+        warn "execution failed:" . $self->dbh->errstr();
+        return 0;
+    }
+
+    $unit->id( $self->dbh->{mysql_insertid} );
+
+    my $langMap = $self->_getLangMap();
+
+    if ( $unit->names ) {
+        foreach my $lang ( keys %{ $unit->names } ) {
+            my $langId = undef;
+            if ( $lang ne 'unknown' ) {
+                $langId = $langMap->{ lc $lang };
+                if ( !$langId ) {
+                    $langId = $self->_saveLanguage($lang);
+                    $langMap->{ lc $lang } = $langId;
+                }
+            }
+
+            my $res = $self->dbh->do( 
+                'INSERT INTO unit_name (unit, name, language) VALUES (?,?,?)', 
+                undef, $unit->id, $unit->names->{$lang}, $langId 
+            );
+
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ( $unit->websites ) {
+        foreach my $url ( keys %{ $unit->websites } ) {
+            my $lang   = $unit->websites->{$url};
+            my $langId = undef;
+            if ( $lang ne 'unknown' ) {
+                $langId = $langMap->{ lc $lang };
+                if ( !$langId ) {
+                    $langId = $self->_saveLanguage($lang);
+                    $langMap->{ lc $lang } = $langId;
+                }
+            }
+
+            my $res = $self->dbh->do( 
+                'INSERT INTO unit_website (unit, url, language) VALUES (?,?,?)', 
+                undef, $unit->id, $url, $langId 
+            );
+
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ( $unit->factsheets ) {
+        foreach my $url ( keys %{ $unit->factsheets } ) {
+            my $lang   = $unit->factsheets->{$url};
+            my $langId = undef;
+            if ( $lang ne 'unknown' ) {
+                $langId = $langMap->{ lc $lang };
+                if ( !$langId ) {
+                    $langId = $self->_saveLanguage($lang);
+                    $langMap->{ lc $lang } = $langId;
+                }
+            }
+
+            my $res = $self->dbh->do( 
+                'INSERT INTO unit_factsheet (unit, name, url, language) VALUES (?,?,?,?)', 
+                undef, $unit->id, 'Factsheet' . ( $lang ne 'unknown' ? ' (' . uc $lang . ')' : '' ), $url, $langId 
+            );
+
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ( $unit->contacts ) {
+        foreach my $contactObject ( @{ $unit->contacts } ) {
+            $self->saveContact($contactObject);
+            if ( $contactObject->id ) {
+                my $res = $self->dbh->do( 
+                    'INSERT INTO unit_contact (unit, contact) VALUES (?,?)', 
+                    undef, $unit->id, $contactObject->id 
+                );
+
+                warn "execution failed:" . $self->dbh->errstr() if !$res;
+            }
+        }
+    }
+
+    return $unit;
 }
 
 no Moose;

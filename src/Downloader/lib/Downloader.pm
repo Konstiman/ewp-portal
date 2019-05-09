@@ -16,6 +16,7 @@ use DBI;
 use Entity::Address;
 use Entity::Contact;
 use Entity::Institution;
+use Entity::Unit;
 use HTTP::Request;
 use LWP::UserAgent;
 use Manager::EntityManager;
@@ -403,6 +404,126 @@ sub getInstitutionFromEndpoint {
     my $institutionObject = $self->parseInstitutionsXML($xml);
 
     return $institutionObject;
+}
+
+=head2 C<getUnitsFromEndpoint( endpoint : Str, institution : Entity::Institution ) : Entity::Unit>
+
+Z url adresy stahne XML data a naparsuje je. Vraci pole objektu tridy Unit.
+
+=cut
+
+sub getUnitsFromEndpoint {
+    my $self        = shift;
+    my $endpoint    = shift;
+    my $institution = shift;
+
+    if (!$institution->unitIds) {
+        return [];
+    }
+
+    my @result = ();
+
+    foreach my $unitId (@{ $institution->unitIds }) {
+        my $xml = $self->downloadXML( $endpoint . '?hei_id=' . $institution->identifier . '&ounit_id=' . $unitId );
+        print $self->statusLine . "\n" if $self->statusLine;
+        if (!$xml) {
+            next;
+        }
+
+        my $unitObject = $self->parseUnitXML($xml);
+        $unitObject->institution($institution);
+        push @result, $unitObject if $unitObject;
+    }
+
+    return \@result;
+}
+
+=head2 C<parseUnitXML ( xml : Str ) : Entity::Unit>
+
+Na vstupu bere string s XML souborem s informacemi o organizacni jednotce. Vraci objekt tridy Unit.
+
+=cut
+
+sub parseUnitXML {
+    my $self = shift;
+    my $xml  = shift;
+
+    my $unitObject = Entity::Unit->new();
+
+    my $dom = XML::LibXML->load_xml( string => $xml );
+    my $xpc = new XML::LibXML::XPathContext($dom);
+
+    $xpc->registerNs( 'ou', 'https://github.com/erasmus-without-paper/ewp-specs-api-ounits/tree/stable-v2' );
+
+    my $unitElement = ( $xpc->findnodes('//ou:ounit') )[0];
+
+    my $identifier = $xpc->findvalue( './ou:ounit-id[text()]', $unitElement );
+    if ($identifier) {
+        $unitObject->identifier($identifier);
+    }
+
+    my $code = $xpc->findvalue( './ou:ounit-code[text()]', $unitElement );
+    if ($code) {
+        $unitObject->code($code);
+    }
+
+    my @names = $xpc->findnodes( './ou:name', $unitElement );
+    foreach my $nameElem (@names) {
+        my $name = $nameElem->textContent;
+        my $lang = $nameElem->getAttribute('xml:lang') || 'unknown';
+        $unitObject->setName( $lang, $name );
+    }
+
+    my $abbreviation = $xpc->findvalue( './ou:abbreviation[text()]', $unitElement );
+    if ($abbreviation) {
+        $unitObject->abbreviation($abbreviation);
+    }
+
+    my $parentIdentifier = $xpc->findvalue( './ou:parent-ounit-id[text()]', $unitElement );
+    if ($parentIdentifier) {
+        $unitObject->parentIdentifier($parentIdentifier);
+    }
+
+    $xpc->registerNs( 'a', 'https://github.com/erasmus-without-paper/ewp-specs-types-address/tree/stable-v1' );
+    my $streetAddressElem = ( $xpc->findnodes( './a:street-address', $unitElement ) )[0];
+    if ($streetAddressElem) {
+        my $addressObject = $self->_parseAddressXML( xpc => $xpc, addressElement => $streetAddressElem );
+        $unitObject->locationAddress($addressObject) if $addressObject;
+    }
+
+    my $mailAddressElem = ( $xpc->findnodes( './a:mailing-address', $unitElement ) )[0];
+    if ($mailAddressElem) {
+        my $addressObject = $self->_parseAddressXML( xpc => $xpc, addressElement => $mailAddressElem );
+        $unitObject->mailingAddress($addressObject) if $addressObject;
+    }
+
+    my @webs = $xpc->findnodes( './ou:website-url', $unitElement );
+    foreach my $webElem (@webs) {
+        my $web  = $webElem->textContent;
+        my $lang = $webElem->getAttribute('xml:lang') || 'unknown';
+        $unitObject->setWebsite( $web, $lang );
+    }
+
+    my $logoUrl = $xpc->findvalue( './ou:logo-url[text()]', $unitElement );
+    if ($logoUrl) {
+        $unitObject->logoUrl($logoUrl);
+    }
+
+    my @factsheets = $xpc->findnodes( './ou:mobility-factsheet-url', $unitElement );
+    foreach my $factsheetElem (@factsheets) {
+        my $url  = $factsheetElem->textContent;
+        my $lang = $factsheetElem->getAttribute('xml:lang') || 'unknown';
+        $unitObject->setFactsheet( $url, $lang );
+    }
+
+    $xpc->registerNs( 'c', 'https://github.com/erasmus-without-paper/ewp-specs-types-contact/tree/stable-v1' );
+    my @contacts = $xpc->findnodes( './c:contact', $unitElement );
+    foreach my $contactElement (@contacts) {
+        my $contactObject = $self->_parseContactXML( xpc => $xpc, contactElement => $contactElement );
+        $unitObject->addContact($contactObject) if $contactObject;
+    }
+
+    return $unitObject;
 }
 
 no Moose;

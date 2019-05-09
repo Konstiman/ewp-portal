@@ -17,6 +17,8 @@ if ( !$xml ) {
 
 my $heis2endpoints = $downloader->parseCatalogueXML($xml);
 
+warn Dumper $heis2endpoints;
+
 my ( $statsSkipped, $statsDownloaded, $statsSaved, $statsUnsaved ) = ( 0, 0, 0, 0 );
 
 my $dsn = "DBI:mysql:database=ewpportal;host=localhost;port=3306";
@@ -49,14 +51,19 @@ foreach my $heiId ( keys %$heis2endpoints ) {
         }
         print $downloader->statusLine . "\n" if $downloader->statusLine;
     }
-    else {
+
+    if (!$institutionObject) {
         # pokud neni institutions api, nema cenu pokracovat dal
         # TODO ale prece jenom vyzkouset
         next;
     }
 
     if ( $endpoints->{'organizational-units'} ) {
-        # TODO stazeni org. units
+        my @unitObjects = @{ $downloader->getUnitsFromEndpoint( $endpoints->{'organizational-units'}, $institutionObject ) };
+        print ".......... downloaded: " . ( scalar @unitObjects ) . "\n";
+        foreach my $unit (@unitObjects) {
+            $manager->saveUnit($unit);
+        }
     }
 
     if ( $endpoints->{'simple-course-replication'} ) {
