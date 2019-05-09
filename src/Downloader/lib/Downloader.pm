@@ -27,7 +27,7 @@ use constant CATALOGUE_URL => 'https://registry.erasmuswithoutpaper.eu/catalogue
 
 use constant DEV_CATALOGUE_URL => 'https://dev-registry.erasmuswithoutpaper.eu/catalogue-v1.xml';
 
-use constant DEVEL_MODE => 1;
+use constant DEVEL_MODE => 0;
 
 use constant VERSION => '1.0.0';
 
@@ -91,7 +91,7 @@ sub downloadXML {
     }
 
     $self->status('ok');
-    $self->statusLine( "Ok:    200 Data from endpoint downloaded successfully ($url)" );
+    $self->statusLine("Ok:    200 Data from endpoint downloaded successfully ($url)");
 
     my $content = $response->content;
 
@@ -417,16 +417,16 @@ sub getUnitsFromEndpoint {
     my $endpoint    = shift;
     my $institution = shift;
 
-    if (!$institution->unitIds) {
+    if ( !$institution->unitIds ) {
         return [];
     }
 
     my @result = ();
 
-    foreach my $unitId (@{ $institution->unitIds }) {
+    foreach my $unitId ( @{ $institution->unitIds } ) {
         my $xml = $self->downloadXML( $endpoint . '?hei_id=' . $institution->identifier . '&ounit_id=' . $unitId );
         print $self->statusLine . "\n" if $self->statusLine;
-        if (!$xml) {
+        if ( !$xml ) {
             next;
         }
 
@@ -524,6 +524,27 @@ sub parseUnitXML {
     }
 
     return $unitObject;
+}
+
+sub getCourseIdsFromEndpoint {
+    my $self     = shift;
+    my $endpoint = shift;
+    my $heiId    = shift;
+
+    # TODO
+    print "would download course ids";
+
+    return [];
+}
+
+sub getCoursesFromEndpoint {
+    my $self         = shift;
+    my $endpoint     = shift;
+    my $courseIdsRef = shift;
+
+    # TODO
+
+    return [];
 }
 
 no Moose;

@@ -60,18 +60,19 @@ foreach my $heiId ( keys %$heis2endpoints ) {
 
     if ( $endpoints->{'organizational-units'} ) {
         my @unitObjects = @{ $downloader->getUnitsFromEndpoint( $endpoints->{'organizational-units'}, $institutionObject ) };
-        print ".......... downloaded: " . ( scalar @unitObjects ) . "\n";
         foreach my $unit (@unitObjects) {
             $manager->saveUnit($unit);
         }
     }
 
-    if ( $endpoints->{'simple-course-replication'} ) {
-        # TODO priprava pro courses
-    }
-
-    if ( $endpoints->{'courses'} ) {
-        # TODO stazeni courses
+    if ( $endpoints->{'simple-course-replication'} && $endpoints->{'courses'} ) {
+        my @loIds = @{ $downloader->getCourseIdsFromEndpoint( $endpoints->{'simple-course-replication'}, $heiId ) };
+        
+        if ( @loIds ) {
+            my @courseObjects = @{ $downloader->getCoursesFromEndpoint( $endpoints->{'courses'}, $heiId, \@loIds ) };
+            # TODO ulozit pokud bude co
+            warn Dumper \@courseObjects;
+        }
     }
 }
 
