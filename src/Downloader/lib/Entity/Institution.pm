@@ -109,7 +109,7 @@ has 'websites' => (
     }
 );
 
-=head2 C<websites : HashRef[Str]>
+=head2 C<factsheets : HashRef[Str]>
 
 Hash url factsheetu instituce v ruznych jazycich.
 
