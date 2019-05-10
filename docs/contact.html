@@ -13,11 +13,66 @@
 
 <ul id="index">
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
+    <ul>
+      <li><a href="#id-:-Int">id : Int</a></li>
+      <li><a href="#names-:-HashRef-Str">names : HashRef[Str]</a></li>
+      <li><a href="#gender-:-Int">gender : Int</a></li>
+      <li><a href="#mailingAddress-:-Entity::Address">mailingAddress : Entity::Address</a></li>
+      <li><a href="#locationAddress-:-Entity::Address">locationAddress : Entity::Address</a></li>
+      <li><a href="#emails-:-ArrayRef-Str">emails : ArrayRef[Str]</a></li>
+      <li><a href="#phones-:-ArrayRef-Str">phones : ArrayRef[Str]</a></li>
+      <li><a href="#faxes-:-ArrayRef-Str">faxes : ArrayRef[Str]</a></li>
+      <li><a href="#description-:-HashRef-Str">description : HashRef[Str]</a></li>
+    </ul>
+  </li>
 </ul>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
 <p>Entita reprezentujici kontakt v siti EWP.</p>
+
+<h1 id="ATTRIBUTES">ATTRIBUTES</h1>
+
+<h2 id="id-:-Int"><code>id : Int</code></h2>
+
+<p>Id kontaktu, pod kterym je ulozen v databazi.</p>
+
+<h2 id="names-:-HashRef-Str"><code>names : HashRef[Str]</code></h2>
+
+<p>Hash pojmenovani kontaktu v ruznych jazycich.</p>
+
+<pre><code>    { &#39;en&#39; =&gt; &#39;Jan Novak&#39; }</code></pre>
+
+<h2 id="gender-:-Int"><code>gender : Int</code></h2>
+
+<p>ISO/IEC 5218 kod pohlavi.</p>
+
+<h2 id="mailingAddress-:-Entity::Address"><code>mailingAddress : Entity::Address</code></h2>
+
+<p>Dorucovaci adresa kontaktu.</p>
+
+<h2 id="locationAddress-:-Entity::Address"><code>locationAddress : Entity::Address</code></h2>
+
+<p>Mistni adresa kontaktu.</p>
+
+<h2 id="emails-:-ArrayRef-Str"><code>emails : ArrayRef[Str]</code></h2>
+
+<p>Pole emailu.</p>
+
+<h2 id="phones-:-ArrayRef-Str"><code>phones : ArrayRef[Str]</code></h2>
+
+<p>Pole telefonnich cisel.</p>
+
+<h2 id="faxes-:-ArrayRef-Str"><code>faxes : ArrayRef[Str]</code></h2>
+
+<p>Pole faxovych cisel.</p>
+
+<h2 id="description-:-HashRef-Str"><code>description : HashRef[Str]</code></h2>
+
+<p>Hash popisu role kontaktu v ruznych jazycich.</p>
+
+<pre><code>    { &#39;en&#39; =&gt; &#39;system administrator&#39; }</code></pre>
 
 
 </body>
