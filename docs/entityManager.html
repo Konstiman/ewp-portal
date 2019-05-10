@@ -1,0 +1,76 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#clearDatabase-:-None">clearDatabase () : None</a></li>
+      <li><a href="#getCountryId-code-:-Str-:-Int">getCountryId ( code : Str ) : Int</a></li>
+      <li><a href="#saveCountryCode-code-:-Str-:-Int">saveCountryCode ( code : Str ) : Int</a></li>
+      <li><a href="#saveAddress-address-:-Entity::Address-:-Entity::Address">saveAddress ( address : Entity::Address ) : Entity::Address</a></li>
+      <li><a href="#saveInstitution-institution-:-Entity::Institution-:-Entity::Institution">saveInstitution ( institution : Entity::Institution ) : Entity::Institution</a></li>
+      <li><a href="#saveContact-contact-:-Entity::Contact-:-Entity::Contact">saveContact ( contact : Entity::Contact ) : Entity::Contact</a></li>
+      <li><a href="#saveUnit-unit-:-Entity::Unit-:-Entity::Unit">saveUnit ( unit : Entity::Unit ) : Entity::Unit</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>TODO dokumentace</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="clearDatabase-:-None"><code>clearDatabase () : None</code></h2>
+
+<p>Smaze obsah neciselnikovych tabulek v db.</p>
+
+<h2 id="getCountryId-code-:-Str-:-Int"><code>getCountryId ( code : Str ) : Int</code></h2>
+
+<p>Vraci id zeme podle kodu, pokud je zeme s timto kodem ulozena v databazi.</p>
+
+<p>Hleda v tabulce `country`.</p>
+
+<h2 id="saveCountryCode-code-:-Str-:-Int"><code>saveCountryCode ( code : Str ) : Int</code></h2>
+
+<p>Ulozi kod zeme do databaze do tabulky `country`. Vraci id nove vlozeneho zaznamu.</p>
+
+<h2 id="saveAddress-address-:-Entity::Address-:-Entity::Address"><code>saveAddress ( address : Entity::Address ) : Entity::Address</code></h2>
+
+<p>Ulozi objekt adresy do databaze do tabulky `address`. Objektu nastavi id nove vlozeneho zaznamu.</p>
+
+<h2 id="saveInstitution-institution-:-Entity::Institution-:-Entity::Institution"><code>saveInstitution ( institution : Entity::Institution ) : Entity::Institution</code></h2>
+
+<p>Ulozi objekt instituce do databaze do tabulky `institution` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
+
+<p>TODO refaktorovat do vice mensich metod.</p>
+
+<h2 id="saveContact-contact-:-Entity::Contact-:-Entity::Contact"><code>saveContact ( contact : Entity::Contact ) : Entity::Contact</code></h2>
+
+<p>Ulozi objekt kontaktu do databaze do tabulky `contact` a navazujicich podtabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
+
+<p>TODO refaktorovat do vice mensich metod.</p>
+
+<h2 id="saveUnit-unit-:-Entity::Unit-:-Entity::Unit"><code>saveUnit ( unit : Entity::Unit ) : Entity::Unit</code></h2>
+
+<p>Ulozi objekt organizacni jednotky do databaze do tabulky `organizational_unit` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
+
+<p>TODO refaktorovat do vice mensich metod.</p>
+
+
+</body>
+
+</html>
+
+

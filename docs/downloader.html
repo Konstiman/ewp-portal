@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#downloadCatalogue-:-Str">downloadCatalogue () : Str</a></li>
+      <li><a href="#downloadXML-url-:-Str-:-Str">downloadXML ( url : Str ) : Str</a></li>
+      <li><a href="#parseCatalogueXML-xml-:-Str-:-HashRef-HashRef-Str">parseCatalogueXML ( xml : Str ) : HashRef[HashRef[Str]]</a></li>
+      <li><a href="#parseInstitutionsXML-xml-:-Str-:-Entity::Institution">parseInstitutionsXML ( xml : Str ) : Entity::Institution</a></li>
+      <li><a href="#getInstitutionFromEndpoint-endpoint-:-Str-heiId-:-Str-:-Entity::Institution">getInstitutionFromEndpoint( endpoint : Str, heiId : Str ) : Entity::Institution</a></li>
+      <li><a href="#getUnitsFromEndpoint-endpoint-:-Str-institution-:-Entity::Institution-:-Entity::Unit">getUnitsFromEndpoint( endpoint : Str, institution : Entity::Institution ) : Entity::Unit</a></li>
+      <li><a href="#parseUnitXML-xml-:-Str-:-Entity::Unit">parseUnitXML ( xml : Str ) : Entity::Unit</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Modul slouzi ke stazeni a ulozeni XML katalogu instituci Erasmus Without Paper.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="downloadCatalogue-:-Str"><code>downloadCatalogue () : Str</code></h2>
+
+<p>Stahne XML katalog z adresy <code>catalogueUrl</code>.</p>
+
+<h2 id="downloadXML-url-:-Str-:-Str"><code>downloadXML ( url : Str ) : Str</code></h2>
+
+<p>Stahne XML katalog z adresy specifikovane parametrem.</p>
+
+<h2 id="parseCatalogueXML-xml-:-Str-:-HashRef-HashRef-Str"><code>parseCatalogueXML ( xml : Str ) : HashRef[HashRef[Str]]</code></h2>
+
+<p>Na vstupu bere string s XML katalogem. Vraci hash id hei =&gt; hash url endpointu.</p>
+
+<h2 id="parseInstitutionsXML-xml-:-Str-:-Entity::Institution"><code>parseInstitutionsXML ( xml : Str ) : Entity::Institution</code></h2>
+
+<p>Na vstupu bere string s XML souborem s informacemi o instituci. Vraci objekt tridy Institution.</p>
+
+<h2 id="getInstitutionFromEndpoint-endpoint-:-Str-heiId-:-Str-:-Entity::Institution"><code>getInstitutionFromEndpoint( endpoint : Str, heiId : Str ) : Entity::Institution</code></h2>
+
+<p>Z url adresy stahne XML data a naparsuje je. Vraci objekt tridy Institution.</p>
+
+<h2 id="getUnitsFromEndpoint-endpoint-:-Str-institution-:-Entity::Institution-:-Entity::Unit"><code>getUnitsFromEndpoint( endpoint : Str, institution : Entity::Institution ) : Entity::Unit</code></h2>
+
+<p>Z url adresy stahne XML data a naparsuje je. Vraci pole objektu tridy Unit.</p>
+
+<h2 id="parseUnitXML-xml-:-Str-:-Entity::Unit"><code>parseUnitXML ( xml : Str ) : Entity::Unit</code></h2>
+
+<p>Na vstupu bere string s XML souborem s informacemi o organizacni jednotce. Vraci objekt tridy Unit.</p>
+
+
+</body>
+
+</html>
+
+
