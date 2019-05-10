@@ -166,7 +166,7 @@ sub saveAddress {
 
 Ulozi objekt instituce do databaze do tabulky `institution` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
+TODO refaktorovat do vice mensich metod.
 
 =cut
 
@@ -273,7 +273,7 @@ sub saveInstitution {
 
 Ulozi objekt kontaktu do databaze do tabulky `contact` a navazujicich podtabulek. Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
+TODO refaktorovat do vice mensich metod.
 
 =cut
 
@@ -422,7 +422,7 @@ sub _saveLanguage {
 Ulozi objekt organizacni jednotky do databaze do tabulky `organizational_unit` a navazujicich tabulek. 
 Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
+TODO refaktorovat do vice mensich metod.
 
 =cut
 

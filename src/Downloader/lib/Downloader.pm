@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 =head1 DESCRIPTION
 
-Modul slouzi ke stazeni a ulozeni XML katalogu instituci Erasmus Without Paper.
+Modul slouzi ke stazeni a ulozeni XML katalogu instituci Erasmus Without Paper.
 
 =cut
 
@@ -48,7 +48,7 @@ has 'statusLine' => (
 
 =head2 C<downloadCatalogue () : Str>
 
-Stahne XML katalog z adresy C<catalogueUrl>.
+Stahne XML katalog z adresy C<catalogueUrl>.
 
 =cut
 
@@ -65,7 +65,7 @@ sub downloadCatalogue {
 
 =head2 C<downloadXML ( url : Str ) : Str>
 
-Stahne XML katalog z adresy specifikovane parametrem.
+Stahne XML katalog z adresy specifikovane parametrem.
 
 =cut
 
@@ -100,7 +100,7 @@ sub downloadXML {
 
 =head2 C<parseCatalogueXML ( xml : Str ) : HashRef[HashRef[Str]]>
 
-Na vstupu bere string s XML katalogem. Vraci hash id hei => hash url endpointu.
+Na vstupu bere string s XML katalogem. Vraci hash id hei => hash url endpointu.
 
 =cut
 
@@ -176,7 +176,7 @@ sub _getEndpoint {
 
 =head2 C<parseInstitutionsXML ( xml : Str ) : Entity::Institution>
 
-Na vstupu bere string s XML souborem s informacemi o instituci. Vraci objekt tridy Institution.
+Na vstupu bere string s XML souborem s informacemi o instituci. Vraci objekt tridy Institution.
 
 =cut
 
@@ -386,7 +386,7 @@ sub _parseContactXML {
 
 =head2 C<getInstitutionFromEndpoint( endpoint : Str, heiId : Str ) : Entity::Institution>
 
-Z url adresy stahne XML data a naparsuje je. Vraci objekt tridy Institution. 
+Z url adresy stahne XML data a naparsuje je. Vraci objekt tridy Institution. 
 
 =cut
 
@@ -408,7 +408,7 @@ sub getInstitutionFromEndpoint {
 
 =head2 C<getUnitsFromEndpoint( endpoint : Str, institution : Entity::Institution ) : Entity::Unit>
 
-Z url adresy stahne XML data a naparsuje je. Vraci pole objektu tridy Unit.
+Z url adresy stahne XML data a naparsuje je. Vraci pole objektu tridy Unit.
 
 =cut
 
@@ -440,7 +440,7 @@ sub getUnitsFromEndpoint {
 
 =head2 C<parseUnitXML ( xml : Str ) : Entity::Unit>
 
-Na vstupu bere string s XML souborem s informacemi o organizacni jednotce. Vraci objekt tridy Unit.
+Na vstupu bere string s XML souborem s informacemi o organizacni jednotce. Vraci objekt tridy Unit.
 
 =cut
 
