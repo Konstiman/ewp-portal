@@ -13,11 +13,80 @@
 
 <ul id="index">
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
+    <ul>
+      <li><a href="#id-:-Int">id : Int</a></li>
+      <li><a href="#identifier-:-Str">identifier : Str</a></li>
+      <li><a href="#otherIdentifiers-:-HashRef-Str">otherIdentifiers : HashRef[Str]</a></li>
+      <li><a href="#names-:-HashRef-Str">names : HashRef[Str]</a></li>
+      <li><a href="#abbreviation-:-Str">abbreviation : Str</a></li>
+      <li><a href="#logoUrl-:-Str">logoUrl : Str</a></li>
+      <li><a href="#websites-:-HashRef-Str">websites : HashRef[Str]</a></li>
+      <li><a href="#websites-:-HashRef-Str1">websites : HashRef[Str]</a></li>
+      <li><a href="#mailingAddress-:-Entity::Address">mailingAddress : Entity::Address</a></li>
+      <li><a href="#locationAddress-:-Entity::Address">locationAddress : Entity::Address</a></li>
+      <li><a href="#contacts-:-ArrayRef-Entity::Contact">contacts : ArrayRef[Entity::Contact]</a></li>
+    </ul>
+  </li>
 </ul>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
 <p>Entita reprezentujici instituci (HEI) v siti EWP.</p>
+
+<h1 id="ATTRIBUTES">ATTRIBUTES</h1>
+
+<h2 id="id-:-Int"><code>id : Int</code></h2>
+
+<p>Id instituce, pod kterym je ulozena v databazi.</p>
+
+<h2 id="identifier-:-Str"><code>identifier : Str</code></h2>
+
+<p>Identifikator instituce, pod kterym je HEI identifikovatelna v EWP (napr. &#39;uw.edu.pl&#39;).</p>
+
+<h2 id="otherIdentifiers-:-HashRef-Str"><code>otherIdentifiers : HashRef[Str]</code></h2>
+
+<p>Hash ostatnich identifikatoru, pod kterymi je HEI identifikovatelna mimo EWP.</p>
+
+<pre><code>    { &#39;erasmus&#39; =&gt; &#39;PL WARSZAW01&#39; }</code></pre>
+
+<h2 id="names-:-HashRef-Str"><code>names : HashRef[Str]</code></h2>
+
+<p>Hash jmen instituce v ruznych jazycich.</p>
+
+<pre><code>    { &#39;en&#39; =&gt; &#39;University of Warsaw&#39; }</code></pre>
+
+<h2 id="abbreviation-:-Str"><code>abbreviation : Str</code></h2>
+
+<p>Zkratka nazvu instituce.</p>
+
+<h2 id="logoUrl-:-Str"><code>logoUrl : Str</code></h2>
+
+<p>Odkaz na logo instituce.</p>
+
+<h2 id="websites-:-HashRef-Str"><code>websites : HashRef[Str]</code></h2>
+
+<p>Hash webu instituce v ruznych jazycich.</p>
+
+<pre><code>    { &#39;http://uw.edu.pl/&#39; =&gt; &#39;pl&#39; }</code></pre>
+
+<h2 id="websites-:-HashRef-Str1"><code>websites : HashRef[Str]</code></h2>
+
+<p>Hash url factsheetu instituce v ruznych jazycich.</p>
+
+<pre><code>    { &#39;https://uw.edu.pl/docs/factsheet.pdf&#39; =&gt; &#39;en&#39; }</code></pre>
+
+<h2 id="mailingAddress-:-Entity::Address"><code>mailingAddress : Entity::Address</code></h2>
+
+<p>Dorucovaci adresa instituce.</p>
+
+<h2 id="locationAddress-:-Entity::Address"><code>locationAddress : Entity::Address</code></h2>
+
+<p>Mistni adresa instituce.</p>
+
+<h2 id="contacts-:-ArrayRef-Entity::Contact"><code>contacts : ArrayRef[Entity::Contact]</code></h2>
+
+<p>Seznam kontaktu instituce.</p>
 
 
 </body>

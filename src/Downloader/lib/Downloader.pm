@@ -33,11 +33,25 @@ use constant VERSION => '1.0.0';
 
 enum Status => [qw/ ok error warning /];
 
+=head1 ATTRIBUTES
+
+=head2 C<status : Str>
+
+Reprezentuje stav downloaderu. Pripustne jsou hodnoty 'ok', 'error' a 'warning'.
+
+=cut
+
 has 'status' => (
     is      => 'rw',
     isa     => 'Status',
     default => 'ok'
 );
+
+=head2 C<status : Str>
+
+Textovy komentar stavu downloaderu.
+
+=cut
 
 has 'statusLine' => (
     is  => 'rw',

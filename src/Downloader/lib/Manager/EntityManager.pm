@@ -11,6 +11,14 @@ TODO dokumentace
 
 use Entity::Institution;
 
+=head1 ATTRIBUTES
+
+=head2 C<dbh : DBI>
+
+Povinny atribut pro ulozeni instance databaze.
+
+=cut
+
 has 'dbh' => (
     is       => 'ro',
     isa      => 'Object',
