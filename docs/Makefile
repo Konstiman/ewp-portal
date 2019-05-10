@@ -14,4 +14,5 @@ html:
 	pod2html --outfile ./address.html --infile ../src/Downloader/lib/Entity/Address.pm
 	pod2html --outfile ./contact.html --infile ../src/Downloader/lib/Entity/Contact.pm
 	pod2html --outfile ./institution.html --infile ../src/Downloader/lib/Entity/Institution.pm
+	pod2html --outfile ./learningOpportunity.html --infile ../src/Downloader/lib/Entity/LearningOpportunity.pm
 	pod2html --outfile ./unit.html --infile ../src/Downloader/lib/Entity/Unit.pm

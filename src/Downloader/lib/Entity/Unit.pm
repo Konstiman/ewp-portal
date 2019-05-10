@@ -80,6 +80,11 @@ Lidsky citelny kod jednotky, ktery ji jednoznacne urcuje v ramci sve instituce.
 
 =cut
 
+has 'code' => (
+	is => 'rw',
+    isa => 'Str'
+);
+
 =head2 C<abbreviation : Str>
 
 Zkratka nazvu jednotky.

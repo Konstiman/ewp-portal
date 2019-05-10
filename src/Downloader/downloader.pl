@@ -17,8 +17,6 @@ if ( !$xml ) {
 
 my $heis2endpoints = $downloader->parseCatalogueXML($xml);
 
-warn Dumper $heis2endpoints;
-
 my ( $statsSkipped, $statsDownloaded, $statsSaved, $statsUnsaved ) = ( 0, 0, 0, 0 );
 
 my $dsn = "DBI:mysql:database=ewpportal;host=localhost;port=3306";
@@ -29,9 +27,6 @@ my $manager = Manager::EntityManager->new( dbh => $dbh );
 $manager->clearDatabase();
 
 foreach my $heiId ( keys %$heis2endpoints ) {
-
-    #next if $heiId ne 'uw.edu.pl';
-
     my $endpoints = $heis2endpoints->{$heiId};
 
     my $institutionObject = undef;
@@ -45,16 +40,12 @@ foreach my $heiId ( keys %$heis2endpoints ) {
             if ( $manager->saveInstitution($institutionObject) ) {
                 ++$statsSaved;
             }
-
-            # TODO
-            #warn Dumper $institutionObject;
         }
         print $downloader->statusLine . "\n" if $downloader->statusLine;
     }
 
     if (!$institutionObject) {
         # pokud neni institutions api, nema cenu pokracovat dal
-        # TODO ale prece jenom vyzkouset
         next;
     }
 
@@ -66,12 +57,13 @@ foreach my $heiId ( keys %$heis2endpoints ) {
     }
 
     if ( $endpoints->{'simple-course-replication'} && $endpoints->{'courses'} ) {
-        my @loIds = @{ $downloader->getCourseIdsFromEndpoint( $endpoints->{'simple-course-replication'}, $heiId ) };
-        
+        my @loIds = @{ $downloader->getOpportunityIdsFromEndpoint( $endpoints->{'simple-course-replication'}, $heiId ) };
+        print $downloader->statusLine . "\n" if $downloader->statusLine;
         if ( @loIds ) {
-            my @courseObjects = @{ $downloader->getCoursesFromEndpoint( $endpoints->{'courses'}, $heiId, \@loIds ) };
-            # TODO ulozit pokud bude co
-            warn Dumper \@courseObjects;
+            my @loObjects = @{ $downloader->getOpportunitiesFromEndpoint( $endpoints->{'courses'}, $heiId, \@loIds ) };
+            foreach my $loObject (@loObjects) {
+                $manager->saveOpportunity($loObject);
+            }
         }
     }
 }

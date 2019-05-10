@@ -16,6 +16,7 @@ use DBI;
 use Entity::Address;
 use Entity::Contact;
 use Entity::Institution;
+use Entity::LearningOpportunity;
 use Entity::Unit;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -540,25 +541,98 @@ sub parseUnitXML {
     return $unitObject;
 }
 
-sub getCourseIdsFromEndpoint {
+=head2 C<getOpportunityIdsFromEndpoint ( endpoint : Str, heiId : Str ) : ArrayRef[Str]>
+
+Stahne a rozparsuje seznam id studijnich prilezitosti dane HEI z daneho endpointu.
+
+=cut
+
+sub getOpportunityIdsFromEndpoint {
     my $self     = shift;
     my $endpoint = shift;
     my $heiId    = shift;
 
-    # TODO
-    print "would download course ids";
+    my $xml = $self->downloadXML( $endpoint . '?hei_id=' . $heiId );
 
-    return [];
+    if ( !$xml ) {
+        return [];
+    }
+
+    my $result = $self->parseCourseReplicationXML($xml);
+
+    return $result;
 }
 
-sub getCoursesFromEndpoint {
+=head2 C<parseCourseReplicationXML ( xml : Str ) : ArrayRef[Str]>
+
+Rozparsuje seznam id studijnich prilezitosti dane HEI z daneho endpointu.
+
+=cut
+
+sub parseCourseReplicationXML {
+    my $self = shift;
+    my $xml  = shift;
+
+    my @result = ();
+
+    my $dom = XML::LibXML->load_xml( string => $xml );
+    my $xpc = new XML::LibXML::XPathContext($dom);
+
+    $xpc->registerNs( 'cr', 'https://github.com/erasmus-without-paper/ewp-specs-api-course-replication/tree/stable-v1' );
+
+    my $responseElement = ( $xpc->findnodes('//cr:course-replication-response') )[0];
+
+    my @idElements = $xpc->findnodes( 'cr:los-id', $responseElement );
+
+    foreach my $element (@idElements) {
+        push @result, $element->textContent();
+    }
+
+    return \@result;
+}
+
+=head2 C<getOpportunitiesFromEndpoint ( endpoint : Str, heiId : Str, courseIdsRef : ArrayRef[Str] ) : ArrayRef[Str]>
+
+Stahne a rozparsuje seznam studijnich prilezitosti dane HEI z daneho endpointu.
+
+=cut
+
+sub getOpportunitiesFromEndpoint {
     my $self         = shift;
     my $endpoint     = shift;
+    my $heiId        = shift;
     my $courseIdsRef = shift;
+
+    my @result = ();
+
+    foreach my $losId (@$courseIdsRef) {
+        my $xml = $self->downloadXML( $endpoint . "?hei_id=$heiId&los_id=$losId" );
+
+        if ( !$xml ) {
+            next;
+        }
+
+        my $opportunityObject = $self->parseCourseXML($xml);
+    }
+
+    return \@result;
+}
+
+=head2 C<parseCourseXML ( xml : Str ) : Entity::LearningOpportunity>
+
+Rozparsuje xml se studijni prilezitosti. Vraci objekt tridy LearningOpportunity.
+
+=cut
+
+sub parseCourseXML {
+    my $self = shift;
+    my $xml  = shift;
+
+    my $opportunity = Entity::LearningOpportunity->new();
 
     # TODO
 
-    return [];
+    return $opportunity;
 }
 
 no Moose;

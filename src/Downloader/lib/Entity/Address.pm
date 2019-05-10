@@ -156,7 +156,7 @@ has 'region' => (
 
 =head2 C<country : Str>
 
-Kod zeme podle ISO 3166-1 alpha-2.
+Kod zeme podle ISO 3166-1 alpha-2.
 
 =cut
 

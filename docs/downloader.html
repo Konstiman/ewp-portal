@@ -28,8 +28,13 @@
       <li><a href="#getInstitutionFromEndpoint-endpoint-:-Str-heiId-:-Str-:-Entity::Institution">getInstitutionFromEndpoint( endpoint : Str, heiId : Str ) : Entity::Institution</a></li>
       <li><a href="#getUnitsFromEndpoint-endpoint-:-Str-institution-:-Entity::Institution-:-Entity::Unit">getUnitsFromEndpoint( endpoint : Str, institution : Entity::Institution ) : Entity::Unit</a></li>
       <li><a href="#parseUnitXML-xml-:-Str-:-Entity::Unit">parseUnitXML ( xml : Str ) : Entity::Unit</a></li>
+      <li><a href="#getOpportunityIdsFromEndpoint-endpoint-:-Str-heiId-:-Str-:-ArrayRef-Str">getOpportunityIdsFromEndpoint ( endpoint : Str, heiId : Str ) : ArrayRef[Str]</a></li>
+      <li><a href="#parseCourseReplicationXML-xml-:-Str-:-ArrayRef-Str">parseCourseReplicationXML ( xml : Str ) : ArrayRef[Str]</a></li>
+      <li><a href="#getOpportunitiesFromEndpoint-endpoint-:-Str-heiId-:-Str-courseIdsRef-:-ArrayRef-Str-:-ArrayRef-Str">getOpportunitiesFromEndpoint ( endpoint : Str, heiId : Str, courseIdsRef : ArrayRef[Str] ) : ArrayRef[Str]</a></li>
+      <li><a href="#parseCourseXML-xml-:-Str-:-Entity::LearningOpportunity">parseCourseXML ( xml : Str ) : Entity::LearningOpportunity</a></li>
     </ul>
   </li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
@@ -75,6 +80,36 @@
 <h2 id="parseUnitXML-xml-:-Str-:-Entity::Unit"><code>parseUnitXML ( xml : Str ) : Entity::Unit</code></h2>
 
 <p>Na vstupu bere string s XML souborem s informacemi o organizacni jednotce. Vraci objekt tridy Unit.</p>
+
+<h2 id="getOpportunityIdsFromEndpoint-endpoint-:-Str-heiId-:-Str-:-ArrayRef-Str"><code>getOpportunityIdsFromEndpoint ( endpoint : Str, heiId : Str ) : ArrayRef[Str]</code></h2>
+
+<p>Stahne a rozparsuje seznam id studijnich prilezitosti dane HEI z daneho endpointu.</p>
+
+<h2 id="parseCourseReplicationXML-xml-:-Str-:-ArrayRef-Str"><code>parseCourseReplicationXML ( xml : Str ) : ArrayRef[Str]</code></h2>
+
+<p>Rozparsuje seznam id studijnich prilezitosti dane HEI z daneho endpointu.</p>
+
+<h2 id="getOpportunitiesFromEndpoint-endpoint-:-Str-heiId-:-Str-courseIdsRef-:-ArrayRef-Str-:-ArrayRef-Str"><code>getOpportunitiesFromEndpoint ( endpoint : Str, heiId : Str, courseIdsRef : ArrayRef[Str] ) : ArrayRef[Str]</code></h2>
+
+<p>Stahne a rozparsuje seznam studijnich prilezitosti dane HEI z daneho endpointu.</p>
+
+<h2 id="parseCourseXML-xml-:-Str-:-Entity::LearningOpportunity"><code>parseCourseXML ( xml : Str ) : Entity::LearningOpportunity</code></h2>
+
+<p>Rozparsuje xml se studijni prilezitosti. Vraci objekt tridy LearningOpportunity.</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-544">Around line 544:</dt>
+<dd>
+
+<p>Non-ASCII character seen before =encoding in &#39;:&nbsp;Str&#39;. Assuming UTF-8</p>
+
+</dd>
+</dl>
 
 
 </body>

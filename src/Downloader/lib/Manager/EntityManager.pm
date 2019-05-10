@@ -549,6 +549,23 @@ sub saveUnit {
     return $unit;
 }
 
+=head2 C<saveOpportunity ( opportunity : Entity::LearningOpportunity ) : Entity::LearningOpportunity>
+
+Ulozi objekt studijni prilezitosti do databaze do tabulky `learning_opportunity` a navazujicich tabulek. 
+Objektu nastavi id nove vlozeneho zaznamu.
+
+TODO refaktorovat do vice mensich metod.
+
+=cut
+
+sub saveOpportunity {
+    my $opportunity = shift;
+
+    # TODO
+
+    return $opportunity;
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
