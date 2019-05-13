@@ -7,4 +7,9 @@ potencialne verejna API:
 
 Institutions API jede na:
  https://ewp.uw.edu.pl/ewp/institutions (uw.edu.pl)
-  
+
+0. aktualni verze cpanu
+cpan CPAN
+
+1. instalace Catalyst
+PERL_MM_USE_DEFAULT=1 cpan Catalyst::Runtime Catalyst::Devel  

@@ -34,6 +34,18 @@ sub index :Path :Args(0) {
     $c->stash(template => 'mainPage.tt2')
 }
 
+=head2 map
+
+The map page (/map)
+
+=cut
+
+sub map :Local :Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash(template => 'map.tt2')
+}
+
 =head2 default
 
 Standard 404 error page

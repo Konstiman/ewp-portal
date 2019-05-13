@@ -2,7 +2,7 @@
 
 <div class="container">
 
-    <h1>Error 404: Požadovaná stránka nebyla nalezena</h1>
+    <h1>Požadovaná stránka nebyla nalezena</h1>
     <p>Na Vámi zadané adrese se nenachází žádný obsah.</p>
     <p><a href="/">Zpět na hlavní stranu</a></p>      
 
