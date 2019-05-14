@@ -34,6 +34,18 @@ sub index :Path :Args(0) {
     $c->stash(template => 'mainPage.tt2')
 }
 
+=head2 list
+
+The institution list page (/list)
+
+=cut
+
+sub list :Local :Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash(template => 'list.tt2')
+}
+
 =head2 map
 
 The map page (/map)
@@ -44,6 +56,18 @@ sub map :Local :Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash(template => 'map.tt2')
+}
+
+=head2 search
+
+The search page (/search)
+
+=cut
+
+sub search :Local :Args(0) {
+    my ( $self, $c ) = @_;
+
+    $c->stash(template => 'search.tt2')
 }
 
 =head2 default
