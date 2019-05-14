@@ -1,7 +1,38 @@
 [% META title = 'Hlavní strana | Student+' -%]
 
-<div class="container">
+<div class="mainPhoto"></div>
 
-    <h1>Hello World!</h1>
+<div class="container description">
+    <p>Vítejte na webových stránkách studentského portálu <strong>student+</strong>. Najdete zde informace o evropských vyšších vzdělávacích institucích zapojených
+    do projektu Erasmus+, které poskytují informace o své studijní nabídce prostřednictvím sítě Erasmus Without Paper. Pro více informací klikněte na jeden z odkazů níže.</p>
+</div>
 
+<div class="container links">
+    <div class="row">
+        <div class="col-sm">
+            <a href="/list">
+                <img class="icon" src="https://img.icons8.com/ios/100/000000/list.png">
+                <h2>Seznam institucí</h2>
+            </a>
+        </div>
+        <div class="col-sm">
+            <a href="/map">
+                <img class="icon" src="https://img.icons8.com/ios/100/000000/map.png">
+                <h2>Mapa</h2>
+            </a>
+        </div>
+        <div class="col-sm">
+            <a href="/search">
+                <img class="icon" src="https://img.icons8.com/ios/100/000000/search.png">
+                <h2>Vyhledávání</h2>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container credits">
+    <p><a href="https://icons8.com/icon/774/list">List icon by Icons8</a>, 
+    <a href="https://icons8.com/icon/343/map">Map icon by Icons8</a>, 
+    <a href="https://icons8.com/icon/132/search">Search icon by Icons8</a>, 
+    <a href="https://www.pexels.com/photo/library-photo-1319854/">Main photo by mentatdgt</a></p>
 </div>
