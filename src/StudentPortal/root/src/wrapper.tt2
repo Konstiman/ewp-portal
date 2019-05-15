@@ -44,8 +44,14 @@
                             </li>
                         </ul>
                     <form action="/list" class="form-inline mt-2 mt-md-0 input-group-sm btn-group-sm">
-                        <input name="keywords" class="form-control mr-sm-2" type="text" placeholder="" aria-label="hledat">
-                        <button class="btn btn-primary my-2 my-sm-0" type="submit">hledat</button>
+                        <input type="text" 
+                               class="form-control"
+                               name="keywords"
+                               placeholder="zadejte klíčová slova"
+                               autocomplete="off">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">hledat</button>
+                        </div>
                     </form>
                 </div>
             </nav>

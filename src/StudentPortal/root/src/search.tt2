@@ -1,7 +1,28 @@
 [% META title = 'Vyhledávání | Student+' -%]
 
-<div class="container">
+<div class="container search">
 
-    TODO
+    <p>V rámci studentského portálu <strong>student+</strong> můžete také vyhledávat, 
+    a to pomocí vyhledávacího pole na této stránce nebo nahoře v navigační liště.</p>
+    <p>Vyhledávání je fulltextové a hledá nad všemi informacemi vyšších vzdělávacích
+    institucí na tomto portálu. Lze tedy hledat např. podle názvů institucí a jejich
+    organizačních jednotek, kontaktních osob, adres nebo nabízených kurzů.</p>
+    <p>Většina obsahu portálu je v anglickém jazyce, proto je doporučeno zadat klíčová
+    slova dotazu v angličtině. </p>
+
+    <br>
+
+    <form action="/list">
+        <div class="input-group mb-3">
+            <input type="text" 
+                   class="form-control" 
+                   placeholder="zadejte klíčová slova: např. 'faculty of informatics germany'"
+                   name="keywords"
+                   autofocus>
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">hledat</button>
+            </div>
+        </div>
+    </form>
 
 </div>
