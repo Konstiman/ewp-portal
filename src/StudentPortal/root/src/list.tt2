@@ -2,26 +2,19 @@
 
 <div class="container">
 
-    [% PERL %]
-        foreach my $institution ( @{ $stash->get('institutions') || [] } ) {
-
-            print '<div class="row">';
-
-            print '<div class="col-sm-2">';
-
-            print '<img src="' . $institution->{ logoUrl } . '">' if $institution->{ logoUrl };
-
-            print '</div>';
-            print '<div class="col-lg-10">';
-
-            my $firstName = shift @{ $institution->{ names } };
-            my $restNames = join ( ', ', @{ $institution->{ names } } ) || '';
-            print '<h2 style="margin-top: 3.5rem;">' . $firstName . ( $restNames ? " ($restNames)" : '' ) . '</h2>';
-
-            print '</div>';
-
-            print '</div>';
-        }
+    [% FOREACH inst = institutions %]
+        <div class="paragraphs">
+            <div class="row">
+                <div style="width: 100%">
+                    <img style="float:left" src="[% inst.logoUrl %]" height="150"/>
+                    <div class="content-heading" style="margin-top: 15px">
+                        <h2>[% inst.identifier %]</h2>
+                        <p>[% inst.street %] [% inst.building %], [% inst.city %] <br>
+                        <a href="/institution/[% inst.id %]">více informací...</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
     [% END %]
 
 </div>

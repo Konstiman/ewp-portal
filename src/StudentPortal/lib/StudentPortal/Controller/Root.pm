@@ -47,20 +47,36 @@ sub list :Local :Args(0) {
 
     my $institutionsData = $c->model('DB::institution')->search(
         {},
-        { join => ['institution_names', 'institution_websites'],
-          '+select' => ['institution_names.Name', 'institution_websites.Url'],
-          '+as'     => ['name', 'url'],
-          order_by  => ['identifier'], }
+        { 
+            join => ['institution_names', 'location_address'],
+            '+select' => [
+                'institution_names.name', 
+                'institution_names.language', 
+                'location_address.buildingNumber',
+                'location_address.streetName',
+                'location_address.locality',
+            ],
+            '+as' => [
+                'name', 
+                'language',
+                'building',
+                'street',
+                'city'
+            ],
+            order_by  => ['identifier'], }
     );
 
     my %id2Inst = ();
     while (my $row = $institutionsData->next()) {
         my $id = $row->get_column('identifier');
-        $id2Inst{ $id } = { 
+        $id2Inst{ $id } = {
+            id           => $row->get_column('id'),
             identifier   => $id,
             abbreviation => $row->get_column('abbreviation') || '',
             logoUrl      => $row->get_column('logo_url')     || '',
-            # TODO adresa mistni
+            building     => $row->get_column('building')     || '',
+            street       => $row->get_column('street')       || '',
+            city         => $row->get_column('city')         || '',
         } unless $id2Inst{ $id };
         $id2Inst{ $id }->{ names } = [  ] unless $id2Inst{ $id }->{ names };
         # TODO anglictina first
@@ -68,8 +84,6 @@ sub list :Local :Args(0) {
     }
 
     my $institutions = [ values %id2Inst ];
-
-    warn Dumper $institutions;
 
     $c->stash(institutions => $institutions);
 

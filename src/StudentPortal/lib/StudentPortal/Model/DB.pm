@@ -7,10 +7,12 @@ __PACKAGE__->config(
     schema_class => 'StudentPortal::Schema',
     
     connect_info => {
+        # TODO veci z configu
         dsn => 'dbi:mysql:ewpportal',
         user => 'ewpportal',
         password => 'ewpportal',
         AutoCommit => q{1},
+        mysql_enable_utf8 => 1
     }
 );
 
