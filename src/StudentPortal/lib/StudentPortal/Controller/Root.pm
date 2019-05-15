@@ -45,47 +45,16 @@ The institution list page (/list)
 sub list :Local :Args(0) {
     my ( $self, $c ) = @_;
 
-    my $institutionsData = $c->model('DB::institution')->search(
-        {},
-        { 
-            join => ['institution_names', 'location_address', { 'location_address' => 'country' }],
-            '+select' => [
-                'institution_names.name', 
-                'institution_names.language',
-                'location_address.locality',
-                'country.name_cz'
-            ],
-            '+as' => [
-                'name', 
-                'language',
-                'city',
-                'country'
-            ]
-        }
-    );
-
-    my %id2Inst = ();
-    while (my $row = $institutionsData->next()) {
-        my $id = $row->get_column('identifier');
-        $id2Inst{ $id } = {
-            id           => $row->get_column('id'),
-            identifier   => $id,
-            abbreviation => $row->get_column('abbreviation') || '',
-            logoUrl      => $row->get_column('logo_url')     || '',
-            city         => $row->get_column('city')         || '',
-            country      => $row->get_column('country')      || '',
-        } unless $id2Inst{ $id };
-        $id2Inst{ $id }->{ names } = [  ] unless $id2Inst{ $id }->{ names };
-        push @{ $id2Inst{ $id }->{ names } }, $row->get_column('name') if !( grep { $_ eq $row->get_column('name') } @{ $id2Inst{ $id }->{ names } } );
-        if ($row->get_column('language')  && $row->get_column('language') == 1) {
-            $id2Inst{ $id }->{ nameEN } = $row->get_column('name');
-        }
+    my $parameters = $c->request->parameters;
+    if ( $parameters->{ 'countryFilter' } ) {
+        $c->stash(filteredCountry => $parameters->{ 'countryFilter' });
     }
 
-    my @institutions = ( values %id2Inst );
-    @institutions = sort { $a->{ id } <=> $b->{ id } } @institutions;
-
+    my @institutions = $c->model('DBIModel')->getInstitutionsListData();
     $c->stash(institutions => \@institutions);
+
+    my @countries = $c->model('DBIModel')->getInstitutionCountriesData();
+    $c->stash(countries => \@countries);
 
     $c->stash(template => 'list.tt2')
 }

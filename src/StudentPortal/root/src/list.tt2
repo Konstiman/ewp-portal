@@ -2,6 +2,46 @@
 
 <div class="container list">
 
+    <div class="row">
+        <div class="col-md-6">
+            <form>
+                <label for="searchBox">Vyhledávání v seznamu</label>
+                <div class="input-group mb-3">
+                    <input type="text" 
+                        class="form-control" 
+                        placeholder="zadejte klíčová slova: např. 'faculty of informatics germany'"
+                        name="keywords"
+                        id="searchBox">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">hledat</button>
+                    </div>
+                </div>
+            </form>
+            <form>
+                <label for="countryFilter">Země</label>
+                <div class="input-group mb-3">
+                    <select class="form-control" 
+                            name="countryFilter"
+                            id="countryFilter">
+                        <option value="0">jakákoliv</option>
+                        [% FOREACH country = countries %]
+                            <option value="[% country.id %]"
+                                [% IF filteredCountry && filteredCountry == (country.id) %] 
+                                    selected 
+                                [% END %]
+                                >[% country.name %]</option>
+                        [% END %]
+                    </select>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">filtrovat</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <hr/>
+
     [% FOREACH inst = institutions %]
         <div class="paragraphs">
             <div class="row">
