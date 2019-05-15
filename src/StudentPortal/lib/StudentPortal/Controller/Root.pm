@@ -48,22 +48,20 @@ sub list :Local :Args(0) {
     my $institutionsData = $c->model('DB::institution')->search(
         {},
         { 
-            join => ['institution_names', 'location_address'],
+            join => ['institution_names', 'location_address', { 'location_address' => 'country' }],
             '+select' => [
                 'institution_names.name', 
-                'institution_names.language', 
-                'location_address.buildingNumber',
-                'location_address.streetName',
+                'institution_names.language',
                 'location_address.locality',
+                'country.name_cz'
             ],
             '+as' => [
                 'name', 
                 'language',
-                'building',
-                'street',
-                'city'
-            ],
-            order_by  => ['identifier'], }
+                'city',
+                'country'
+            ]
+        }
     );
 
     my %id2Inst = ();
@@ -74,18 +72,20 @@ sub list :Local :Args(0) {
             identifier   => $id,
             abbreviation => $row->get_column('abbreviation') || '',
             logoUrl      => $row->get_column('logo_url')     || '',
-            building     => $row->get_column('building')     || '',
-            street       => $row->get_column('street')       || '',
             city         => $row->get_column('city')         || '',
+            country      => $row->get_column('country')      || '',
         } unless $id2Inst{ $id };
         $id2Inst{ $id }->{ names } = [  ] unless $id2Inst{ $id }->{ names };
-        # TODO anglictina first
         push @{ $id2Inst{ $id }->{ names } }, $row->get_column('name') if !( grep { $_ eq $row->get_column('name') } @{ $id2Inst{ $id }->{ names } } );
+        if ($row->get_column('language')  && $row->get_column('language') == 1) {
+            $id2Inst{ $id }->{ nameEN } = $row->get_column('name');
+        }
     }
 
-    my $institutions = [ values %id2Inst ];
+    my @institutions = ( values %id2Inst );
+    @institutions = sort { $a->{ id } <=> $b->{ id } } @institutions;
 
-    $c->stash(institutions => $institutions);
+    $c->stash(institutions => \@institutions);
 
     $c->stash(template => 'list.tt2')
 }

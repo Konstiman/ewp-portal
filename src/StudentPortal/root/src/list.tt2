@@ -1,20 +1,31 @@
 [% META title = 'Seznam institucí | Student+' -%]
 
-<div class="container">
+<div class="container list">
 
     [% FOREACH inst = institutions %]
         <div class="paragraphs">
             <div class="row">
                 <div style="width: 100%">
-                    <img style="float:left" src="[% inst.logoUrl %]" height="150"/>
-                    <div class="content-heading" style="margin-top: 15px">
-                        <h2>[% inst.identifier %]</h2>
-                        <p>[% inst.street %] [% inst.building %], [% inst.city %] <br>
+                    [% IF inst.logoUrl %]
+                        <img style="float:left; width: 150px;" src="[% inst.logoUrl %]"/>
+                    [% ELSE %]
+                        <svg style="float:left; width: 150px;">
+                            <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
+                        </svg>
+                    [% END %]
+                    <div class="content-heading" style="margin-top: 15px;">
+                        [% IF inst.nameEN %]
+                             <h2>[% inst.nameEN %]</h2>
+                        [% ELSE %]
+                            <h2>[% inst.names.first %]</h2>
+                        [% END %]
+                        <p>[% inst.city %], [% inst.country %]<br>
                         <a href="/institution/[% inst.id %]">více informací...</a></p>
                     </div>
                 </div>
             </div>
         </div>
+        <hr/>
     [% END %]
 
 </div>
