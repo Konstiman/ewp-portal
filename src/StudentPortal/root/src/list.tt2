@@ -7,7 +7,9 @@
             <div class="row">
                 <div style="width: 100%">
                     [% IF inst.logoUrl %]
-                        <img style="float:left; width: 150px;" src="[% inst.logoUrl %]"/>
+                        <div style="float:left; width: 150px; height: 150px;">
+                            <img style="max-width: 150px; max-height: 150px;" src="[% inst.logoUrl %]"/>
+                        </div>
                     [% ELSE %]
                         <svg style="float:left; width: 150px;">
                             <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
