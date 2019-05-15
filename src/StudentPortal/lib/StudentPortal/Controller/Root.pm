@@ -2,6 +2,8 @@ package StudentPortal::Controller::Root;
 use Moose;
 use namespace::autoclean;
 
+use Data::Dumper;
+
 BEGIN { extends 'Catalyst::Controller' }
 
 #
@@ -42,6 +44,34 @@ The institution list page (/list)
 
 sub list :Local :Args(0) {
     my ( $self, $c ) = @_;
+
+    my $institutionsData = $c->model('DB::institution')->search(
+        {},
+        { join => ['institution_names', 'institution_websites'],
+          '+select' => ['institution_names.Name', 'institution_websites.Url'],
+          '+as'     => ['name', 'url'],
+          order_by  => ['identifier'], }
+    );
+
+    my %id2Inst = ();
+    while (my $row = $institutionsData->next()) {
+        my $id = $row->get_column('identifier');
+        $id2Inst{ $id } = { 
+            identifier   => $id,
+            abbreviation => $row->get_column('abbreviation') || '',
+            logoUrl      => $row->get_column('logo_url')     || '',
+            # TODO adresa mistni
+        } unless $id2Inst{ $id };
+        $id2Inst{ $id }->{ names } = [  ] unless $id2Inst{ $id }->{ names };
+        # TODO anglictina first
+        push @{ $id2Inst{ $id }->{ names } }, $row->get_column('name') if !( grep { $_ eq $row->get_column('name') } @{ $id2Inst{ $id }->{ names } } );
+    }
+
+    my $institutions = [ values %id2Inst ];
+
+    warn Dumper $institutions;
+
+    $c->stash(institutions => $institutions);
 
     $c->stash(template => 'list.tt2')
 }

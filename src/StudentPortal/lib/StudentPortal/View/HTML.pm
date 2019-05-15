@@ -10,6 +10,7 @@ __PACKAGE__->config(
     TIMER              => 0,
     WRAPPER            => 'wrapper.tt2',
     ENCODING           => 'utf-8',
+    EVAL_PERL          => 1
 );
 
 =head1 NAME
