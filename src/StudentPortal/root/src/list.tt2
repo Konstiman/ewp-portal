@@ -62,7 +62,7 @@
                             <h2>[% inst.names.first %]</h2>
                         [% END %]
                         <p>[% inst.city %], [% inst.country %]<br>
-                        <a href="/institution/[% inst.id %]">více informací...</a></p>
+                        <a href="/institution/[% inst.identifier %]">více informací...</a></p>
                     </div>
                 </div>
             </div>

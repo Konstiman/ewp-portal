@@ -13,7 +13,27 @@ __PACKAGE__->config(
     },
 );
 
-# TODO komentar
+=head1 NAME
+
+StudentPortal::Model::DBIModel - DBI Model Class
+
+=head1 SYNOPSIS
+
+See L<StudentPortal>
+
+=head1 DESCRIPTION
+
+DBI Model Class.
+
+=head1 METHODS
+
+=head2 getInstitutionsListData
+
+Returns list with all institutions and their basic data:
+id, identifier, names, abbreviation, logo, locality and country.
+
+=cut
+
 sub getInstitutionsListData {
     my $self = shift;
 
@@ -69,6 +89,13 @@ sub getInstitutionsListData {
     return wantarray ? @institutions : \@institutions;
 }
 
+=head2 getInstitutionCountriesData
+
+Returns list with all countries with at least one institution. Each entry
+contains country id and country name.
+
+=cut
+
 sub getInstitutionCountriesData {
     my $self = shift;
 
@@ -97,17 +124,187 @@ sub getInstitutionCountriesData {
     return wantarray ? @result : \@result;
 }
 
-=head1 NAME
+=head2 getInstitutionData
 
-StudentPortal::Model::DBIModel - DBI Model Class
+Returns hash with information about the address specified by parameter.
 
-=head1 SYNOPSIS
+=cut
 
-See L<StudentPortal>
+sub getAddress {
+    my $self = shift;
+    my $id   = shift;
 
-=head1 DESCRIPTION
+    my $dbh = $self->dbh;
 
-DBI Model Class.
+    my $sth = $dbh->prepare('
+        SELECT  recipient,
+                addressLines,
+                buildingNumber,
+                buildingName,
+                streetName,
+                unit,
+                floor,
+                pobox,
+                deliveryPoint,
+                postalCode,
+                locality,
+                region,
+                country.name_cz country
+        FROM    address
+                LEFT JOIN country ON address.country = country.id
+        WHERE   address.id = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my $row = $sth->fetchrow_hashref();
+    $sth->finish();
+
+    if (!$row) {
+        return undef;
+    }
+
+    return $row;
+}
+
+=head2 getInstitutionData
+
+Returns hash with information about one particular institution.
+
+=cut
+
+sub getInstitutionData {
+    my $self  = shift;
+    my $ident = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  inst.id,
+                inst.abbreviation,
+                inst.logo_url logoUrl,
+                inst.location_address locationAddressId,
+                inst.mailing_address mailingAddressId
+        FROM    institution inst
+        WHERE   inst.identifier = ?'
+    );
+
+    if ( !$sth || !$sth->execute($ident) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my $row = $sth->fetchrow_hashref();
+    $sth->finish();
+
+    if (!$row) {
+        return undef;
+    }
+
+    my %result = %{ $row };
+
+    my $id         = $row->{id};
+    my @names      = $self->getInstitutionNames($id);
+    my $mainName   = '';
+    my @otherNames = ();
+    foreach my $nameRef ( @names ) {
+        if ( $nameRef->{ lang } && lc $nameRef->{ lang } eq 'en' ) {
+            $mainName = $nameRef->{ name };
+        }
+        else {
+            push @otherNames, $nameRef;
+        }
+    }
+    if ( !$mainName ) {
+        my $nameRef = shift @otherNames;
+        $mainName   = $nameRef->{ name };
+    }
+
+    $result{ name } = $mainName;
+    $result{ otherNames } = \@otherNames;
+    $result{ websites } = $self->getInstitutionWebsites($id);
+    #$result{ facsheets } = $self->getInstitutionFactsheets($id);
+    #$result{ contacts } = $self->getInstitutionContacts($id);
+    $result{ locationAddress } = $self->getAddress($result{ locationAddressId }) if $result{ locationAddressId };
+    $result{ mailingAddress } = $self->getAddress($result{ mailingAddressId }) if $result{ mailingAddressId };
+
+    return \%result;
+}
+
+=head2 getInstitutionNames
+
+Returns array of one particular institution's names.
+
+=cut
+
+sub getInstitutionNames {
+    my $self = shift;
+    my $id   = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  inst.name,
+                lang.abbreviation lang,
+                lang.flag_url flagUrl
+        FROM    institution_name inst
+                LEFT JOIN language lang ON inst.language = lang.id
+        WHERE   inst.institution = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my @result = ();
+
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        push @result, $row;
+    }
+    $sth->finish();
+
+    return wantarray ? @result : \@result;
+}
+
+=head2 getInstitutionWebsites
+
+Returns array of one particular institution's websites.
+
+=cut
+
+sub getInstitutionWebsites {
+    my $self = shift;
+    my $id   = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  inst.url,
+                lang.abbreviation lang,
+                lang.flag_url flagUrl
+        FROM    institution_website inst
+                LEFT JOIN language lang ON inst.language = lang.id
+        WHERE   inst.institution = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my @result = ();
+
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        push @result, $row;
+    }
+    $sth->finish();
+
+    return wantarray ? @result : \@result;
+}
 
 =head1 AUTHOR
 

@@ -1,0 +1,48 @@
+[% META title = ' Instituce | Student+' -%]
+
+<div class="container">
+    <div class="paragraphs">
+        <div class="row">
+            <div style="width: 100%">
+                [% IF institution.logoUrl %]
+                    <div style="float:left; width: 150px; height: 150px;">
+                        <img style="max-width: 150px; max-height: 150px;" src="[% institution.logoUrl %]"/>
+                    </div>
+                [% ELSE %]
+                    <svg style="float:left; width: 150px;">
+                        <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
+                    </svg>
+                [% END %]
+                <div class="content-heading" style="margin-top: 15px;">
+                    <h1>
+                        [% institution.name %]
+                        [% IF institution.abbreviation %]
+                            ([% institution.abbreviation %])
+                        [% END %]
+                    </h1>
+                    <p>
+                        [% FOREACH otherName = institution.otherNames %]
+                            [% IF otherName.flagUrl %]
+                                <svg style="width: 1.3rem; height: 0.8rem">
+                                <!-- TODO dodelat real vlajecky -->
+                                    <rect style="fill:rgb(0,255,255); width: 1.3rem; height: 0.8rem"/>
+                                </svg>
+                            [% END %]
+                            [% otherName.name %]<br>
+                        [% END %]
+
+                        [% FOREACH website = institution.websites %]
+                            [% IF website.flagUrl %]
+                                <svg style="width: 1.3rem; height: 0.8rem">
+                                    <rect style="fill:rgb(0,255,255); width: 1.3rem; height: 0.8rem"/>
+                                </svg>
+                            [% END %]
+                            <a href="[% website.url %]">[% website.url %]</a>&nbsp;
+                        [% END %]
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

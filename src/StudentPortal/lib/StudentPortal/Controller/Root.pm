@@ -59,6 +59,22 @@ sub list :Local :Args(0) {
     $c->stash(template => 'list.tt2')
 }
 
+=head2 institution
+
+The particular institution page (/institution/:identifier)
+
+=cut
+
+sub institution :Local :Args(1) {
+    my ( $self, $c, $identifier ) = @_;
+
+    my $institution = $c->model('DBIModel')->getInstitutionData($identifier);
+
+    $c->stash(institution => $institution);
+
+    $c->stash(template => 'institution.tt2')
+}
+
 =head2 map
 
 The map page (/map)
