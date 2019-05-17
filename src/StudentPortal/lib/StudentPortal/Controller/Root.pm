@@ -84,6 +84,10 @@ The map page (/map)
 sub map :Local :Args(0) {
     my ( $self, $c ) = @_;
 
+    my @institutionCities = $c->model('DBIModel')->getInstitutionCities();
+
+    $c->stash(places => \@institutionCities);
+
     $c->stash(template => 'map.tt2')
 }
 

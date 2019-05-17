@@ -234,6 +234,31 @@ sub getInstitutionData {
     return \%result;
 }
 
+sub getInstitutionCities {
+    my $self = shift;
+
+    my @institutions = $self->getInstitutionsListData();
+
+    my @result = ();
+
+    foreach my $inst ( @institutions ) {
+        my $ident = $inst->{ identifier };
+        my $name  = $inst->{ nameEN };
+        if (!$name) {
+            $name = shift @{ $inst->{ names } };
+        }
+        my $city    = $inst->{ city }    || '';
+        my $country = $inst->{ country } || '';
+        push @result, {
+            address    => "$city $country",
+            name       => $name,
+            identifier => $ident
+        }
+    }
+
+    return wantarray ? @result : \@result;
+}
+
 =head2 getInstitutionNames
 
 Returns array of one particular institution's names.

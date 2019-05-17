@@ -2,17 +2,61 @@
 
 <div class="container">
 
-    <div id="map" style="size: 100%"></div>
-    <script>
-        var map;
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: {lat: -34.397, lng: 150.644},
-                zoom: 8
-            });
-        }
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"
-            async defer></script>
+    <div id="m" style="height: 450px"></div>
 
 </div>
+
+<div class="container description">
+    <p>Na mapě je pomocí ikonek znázorněna poloha všech institucí, o kterých portál uchovává nějaké informace. Kliknutím 
+    na ikonku na mapě dojde k zobrazení názvu instituce a odkazu na další informace.</p>
+</div>
+
+<script type="text/javascript" src="https://api.mapy.cz/loader.js"></script>
+<script type="text/javascript">Loader.load();</script>
+<script type="text/javascript">
+    var CENTER = SMap.Coords.fromWGS84(14.41790, 50.12655);
+    var MARKLAYER = new SMap.Layer.Marker();
+
+    var m = new SMap(JAK.gel("m"), CENTER, 4);
+    m.addControl(new SMap.Control.Sync());
+    m.addDefaultLayer(SMap.DEF_BASE).enable();
+    m.addDefaultControls(); 
+
+    m.addLayer(MARKLAYER);
+    MARKLAYER.enable();
+
+    var unis = [];
+
+    [% FOREACH place = places %]
+        unis.push({
+            'address': '[% place.address %]',
+            'name': '[% place.name %]',
+            'identifier': '[% place.identifier %]'
+        });
+    [% END %]
+
+    unis.forEach( function (uni, index) {
+        placeMarker(uni.address, uni.name, uni.identifier);
+    });
+
+    function placeMarker(address, label, identifier) {
+        new SMap.Geocoder(address, function (geocoder) {
+            if (!geocoder.getResults()[0].results.length) {
+                return;
+            }
+            
+            var results = geocoder.getResults()[0].results;
+            var firstResult = results.shift();
+
+            var coordinates = firstResult.coords;
+
+            var card = new SMap.Card();
+            card.getHeader().innerHTML = "<strong>" + label + "</strong>";
+            card.getBody().innerHTML = '<a href="/institution/' + identifier + '">více informací...</a>';
+
+            var marker = new SMap.Marker(coordinates, "myMarker_" + identifier);
+            marker.decorate(SMap.Marker.Feature.Card, card);
+            MARKLAYER.addMarker(marker);
+        });
+    }
+</script>
