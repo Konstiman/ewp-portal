@@ -1,5 +1,16 @@
 [% META title = ' Instituce | Student+' -%]
 
+<!-- MACRO pro vlozeni vlajky -->
+[% MACRO flag(url) BLOCK  %]
+    [% IF url %]
+        <img src="[% url %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
+    [% ELSE %]
+        <svg style="width: 1.2rem; height: 0.8rem"/>
+            <rect style="fill: rgb(0,255,255); width: 1.2rem; height: 0.8rem"/>
+        </svg>
+    [% END %]
+[% END %]
+
 <div class="container">
     <div class="paragraphs">
         <div class="row">
@@ -22,24 +33,12 @@
                     </h1>
                     <p>
                         [% FOREACH otherName = institution.otherNames %]
-                            [% IF otherName.flagUrl %]
-                                <img src="[% otherName.flagUrl %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
-                            [% ELSE %]
-                                <svg style="width: 1.2rem; height: 0.8rem"/>
-                                    <rect style="fill:rgb(0,255,255); width: 1.2rem; height: 0.8rem"/>
-                                </svg>
-                            [% END %]
+                            [% flag(otherName.flagUrl) %]
                             [% otherName.name %]<br>
                         [% END %]
 
                         [% FOREACH website = institution.websites %]
-                            [% IF website.flagUrl %]
-                                <img src="[% website.flagUrl %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
-                            [% ELSE %]
-                                <svg style="width: 1.2rem; height: 0.8rem"/>
-                                    <rect style="fill:rgb(0,255,255); width: 1.2rem; height: 0.8rem"/>
-                                </svg>
-                            [% END %]
+                            [% flag(website.flagUrl) %]
                             <a href="[% website.url %]">[% website.url %]</a>&nbsp;
                         [% END %]
                     </p>
@@ -50,6 +49,32 @@
     <hr/>
 </div>
 
+<!-- MACRO pro vlozeni adresniho radku -->
+[% MACRO addressLine(addressLine) BLOCK  %]
+    [% IF addressLine %]<li class="list-group-item">[% addressLine %]</li>[% END %]
+[% END %]
+
+<!-- MACRO pro vlozeni adresy -->
+[% MACRO addressInList(address, label) BLOCK  %]
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>[% label %]:</strong></li>
+        [% addressLine(address.recipient) %]
+        [% addressLine(address.addressLines) %]
+        [% IF address.streetName && (address.buildingNumber || address.buildingName) %]
+            <li class="list-group-item">[% address.buildingName %] [% address.streetName %] [% address.buildingNumber %]</li>
+        [% END %]
+        [% addressLine(address.unit) %]
+        [% addressLine(address.floor) %]
+        [% addressLine(address.pobox) %]
+        [% addressLine(address.deliveryPoint) %]
+        [% IF address.postalCode || address.locality %]
+            <li class="list-group-item">[% address.postalCode %] [% address.locality %]</li>
+        [% END %]
+        [% addressLine(address.region) %]
+        [% addressLine(address.country) %]
+    </ul>
+[% END %]
+
 <div class="container">
     [% IF institution.factsheets && institution.factsheets.size > 0 %]
         <div class="row">
@@ -58,13 +83,7 @@
                 <li class="list-inline-item"><strong>Informace: </strong></li>
             [% FOREACH sheet = institution.factsheets %]
                 <li class="list-inline-item">
-                    [% IF sheet.flagUrl %]
-                        <img src="[% sheet.flagUrl %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
-                    [% ELSE %]
-                        <svg style="width: 1.2rem; height: 0.8rem"/>
-                            <rect style="fill:rgb(0,255,255); width: 1.2rem; height: 0.8rem"/>
-                        </svg>
-                    [% END %]
+                    [% flag(sheet.flagUrl) %]
                     <a href="[% sheet.url %]">[% IF sheet.name %][% sheet.name %][% ELSE %][% sheet.url %][% END %]</a>&nbsp;
                 </li>
             [% END %]
@@ -77,47 +96,13 @@
     [% IF institution.locationAddress || institution.mailingAddress %]
         <div class="row">
             [% IF institution.locationAddress %]
-                [% laddr = institution.locationAddress %]
                 <div class="col-sm-6">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>Hlavní adresa:</strong></li>
-                        [% IF laddr.recipient %]<li class="list-group-item">[% laddr.recipient %]</li>[% END %]
-                        [% IF laddr.addressLines %]<li class="list-group-item">[% laddr.addressLines %]</li>[% END %]
-                        [% IF laddr.streetName && (laddr.buildingNumber || laddr.buildingName) %]
-                            <li class="list-group-item">[% laddr.buildingName %] [% laddr.streetName %] [% laddr.buildingNumber %]</li>
-                        [% END %]
-                        [% IF laddr.unit %]<li class="list-group-item">jednotka: [% laddr.unit %]</li>[% END %]
-                        [% IF laddr.floor %]<li class="list-group-item">podlaží: [% laddr.floor %]</li>[% END %]
-                        [% IF laddr.pobox %]<li class="list-group-item">pobox: [% laddr.pobox %]</li>[% END %]
-                        [% IF laddr.deliveryPoint %]<li class="list-group-item">místo doručení: [% laddr.deliveryPoint %]</li>[% END %]
-                        [% IF laddr.postalCode || laddr.locality %]
-                            <li class="list-group-item">[% laddr.postalCode %] [% laddr.locality %]</li>
-                        [% END %]
-                        [% IF laddr.region %]<li class="list-group-item">[% laddr.region %]</li>[% END %]
-                        [% IF laddr.country %]<li class="list-group-item">[% laddr.country %]</li>[% END %]
-                    </ul>
+                    [% addressInList(institution.locationAddress, 'Hlavní adresa') %]
                 </div>
             [% END %]
             [% IF institution.mailingAddress %]
-                [% maddr = institution.mailingAddress %]
                 <div class="col-sm-6">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><strong>Doručovací adresa:</strong></li>
-                        [% IF maddr.recipient %]<li class="list-group-item">[% maddr.recipient %]</li>[% END %]
-                        [% IF maddr.addressLines %]<li class="list-group-item">[% maddr.addressLines %]</li>[% END %]
-                        [% IF maddr.streetName && (maddr.buildingNumber || maddr.buildingName) %]
-                            <li class="list-group-item">[% maddr.buildingName %] [% maddr.streetName %] [% maddr.buildingNumber %]</li>
-                        [% END %]
-                        [% IF maddr.unit %]<li class="list-group-item">jednotka: [% maddr.unit %]</li>[% END %]
-                        [% IF maddr.floor %]<li class="list-group-item">podlaží: [% maddr.floor %]</li>[% END %]
-                        [% IF maddr.pobox %]<li class="list-group-item">pobox: [% maddr.pobox %]</li>[% END %]
-                        [% IF maddr.deliveryPoint %]<li class="list-group-item">místo doručení: [% maddr.deliveryPoint %]</li>[% END %]
-                        [% IF maddr.postalCode || maddr.locality %]
-                            <li class="list-group-item">[% maddr.postalCode %] [% maddr.locality %]</li>
-                        [% END %]
-                        [% IF maddr.region %]<li class="list-group-item">[% maddr.region %]</li>[% END %]
-                        [% IF maddr.country %]<li class="list-group-item">[% maddr.country %]</li>[% END %]
-                    </ul>
+                    [% addressInList(institution.mailingAddress, 'Doručovací adresa') %]
                 </div>
             [% END %]
         </div>
