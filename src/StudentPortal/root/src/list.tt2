@@ -42,25 +42,23 @@
 
     <hr/>
 
-    [% FOREACH inst = institutions %]
-        <div class="paragraphs">
-            <div class="row">
-                <div style="width: 100%">
-                    [% IF inst.logoUrl %]
-                        <div style="float:left; width: 150px; height: 150px;">
-                            <img style="max-width: 150px; max-height: 150px;" src="[% inst.logoUrl %]"/>
-                        </div>
-                    [% ELSE %]
-                        <svg style="float:left; width: 150px;">
-                            <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
-                        </svg>
-                    [% END %]
-                    <div class="content-heading" style="margin-top: 15px;">
-                        <h2>[% inst.mainName %]</h2>
-                        <p>[% inst.city %], [% inst.country %]<br>
-                        <a href="/institution/[% inst.identifier %]">více informací...</a></p>
+    [% FOREACH institution = institutions %]
+        <div class="row">
+            <div class="col-sm-2">
+                [% IF institution.logoUrl %]
+                    <div style="width: 150px; height: 150px; text-align: center;">
+                        <img style="max-width: 150px; max-height: 150px;" src="[% institution.logoUrl %]"/>
                     </div>
-                </div>
+                [% ELSE %]
+                    <svg style="width: 150px;">
+                        <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
+                    </svg>
+                [% END %]
+            </div>
+            <div class="col-sm-10" style="margin-top: 1.5rem;">
+                <h2>[% institution.mainName %]</h2>
+                <p>[% institution.city %], [% institution.country %]<br>
+                <a href="/institution/[% institution.identifier %]">více informací...</a></p>
             </div>
         </div>
         <hr/>

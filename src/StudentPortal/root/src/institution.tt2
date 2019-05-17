@@ -1,9 +1,15 @@
 [% META title = ' Instituce | Student+' -%]
 
+[% MACRO flagOrNothing(url) BLOCK  %]
+    [% IF url %]
+        <img src="[% url %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
+    [% END %]
+[% END %]
+
 <!-- MACRO pro vlozeni vlajky -->
 [% MACRO flag(url) BLOCK  %]
     [% IF url %]
-        <img src="[% url %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
+        [% flagOrNothing(url) %]
     [% ELSE %]
         <svg style="width: 1.2rem; height: 0.8rem"/>
             <rect style="fill: rgb(0,255,255); width: 1.2rem; height: 0.8rem"/>
@@ -12,38 +18,40 @@
 [% END %]
 
 <div class="container">
-    <div class="paragraphs">
-        <div class="row">
-            <div style="width: 100%">
-                [% IF institution.logoUrl %]
-                    <div style="float:left; width: 150px; height: 150px;">
-                        <img style="max-width: 150px; max-height: 150px;" src="[% institution.logoUrl %]"/>
-                    </div>
-                [% ELSE %]
-                    <svg style="float:left; width: 150px;">
-                        <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
-                    </svg>
-                [% END %]
-                <div class="content-heading" style="margin-top: 15px;">
-                    <h1>
-                        [% institution.name %]
-                        [% IF institution.abbreviation %]
-                            ([% institution.abbreviation %])
-                        [% END %]
-                    </h1>
-                    <p>
-                        [% FOREACH otherName = institution.otherNames %]
-                            [% flag(otherName.flagUrl) %]
-                            [% otherName.name %]<br>
-                        [% END %]
-
-                        [% FOREACH website = institution.websites %]
-                            [% flag(website.flagUrl) %]
-                            <a href="[% website.url %]">[% website.url %]</a>&nbsp;
-                        [% END %]
-                    </p>
+    <div class="row">
+        <div class="col-sm-2">
+            [% IF institution.logoUrl %]
+                <div style="width: 150px; height: 150px;">
+                    <img style="max-width: 150px; max-height: 150px;" src="[% institution.logoUrl %]"/>
                 </div>
-            </div>
+            [% ELSE %]
+                <svg style="width: 150px;">
+                    <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
+                </svg>
+            [% END %]
+        </div>
+        <div class="col-sm-10" style="margin-top: 1.5rem;">
+                <h1>
+                    [% institution.name %]
+                    [% IF institution.abbreviation %]
+                        ([% institution.abbreviation %])
+                    [% END %]
+                </h1>
+                <p>
+                    [% FOREACH otherName = institution.otherNames %]
+                        [% flag(otherName.flagUrl) %]
+                        [% otherName.name %]<br>
+                    [% END %]
+
+                    <ul class="list-inline" style="margin-top: -0.8rem; margin-bottom: -0.8rem;">
+                        [% FOREACH website = institution.websites %]
+                            <li class="list-inline-item">
+                                [% flag(website.flagUrl) %]
+                                <a href="[% website.url %]">[% website.url %]</a>&nbsp;
+                            </li>
+                        [% END %]
+                    </ul>
+                </p>
         </div>
     </div>
     <hr/>
@@ -80,13 +88,34 @@
     <ul class="list-group list-group-flush">
         <li class="list-group-item">
             [% FOREACH name = contact.names %]
-                [% flag(name.flagUrl) %]<strong>[% name.name %]</strong><br/>
+                [% flagOrNothing(name.flagUrl) %]<strong>[% name.name %]</strong><br/>
             [% END %]
         </li>
         [% IF contact.emails && contact.emails.size > 0 %]
             <li class="list-group-item"><strong>E-mail: </strong>
             [% FOREACH email = contact.emails %]
                 [% email.email %]<br/>
+            [% END %]
+            </li>
+        [% END %]
+        [% IF contact.phones && contact.phones.size > 0 %]
+            <li class="list-group-item"><strong>Tel. č.: </strong>
+            [% FOREACH phone = contact.phones %]
+                [% phone.phoneNumber %]<br/>
+            [% END %]
+            </li>
+        [% END %]
+        [% IF contact.faxes && contact.faxes.size > 0 %]
+            <li class="list-group-item"><strong>Fax: </strong>
+            [% FOREACH fax = contact.faxes %]
+                [% fax.faxNumber %]<br/>
+            [% END %]
+            </li>
+        [% END %]
+        [% IF contact.description && contact.description.size > 0 %]
+            <li class="list-group-item"><strong>Popis: </strong>
+            [% FOREACH desc = contact.description %]
+                [% flagOrNothing(desc.flagUrl) %] [% desc.text %]<br/>
             [% END %]
             </li>
         [% END %]
@@ -97,15 +126,15 @@
     [% IF institution.factsheets && institution.factsheets.size > 0 %]
         <div class="row">
             <div class="col-12">
-            <ul class="list-inline">
-                <li class="list-inline-item"><strong>Informace: </strong></li>
-            [% FOREACH sheet = institution.factsheets %]
-                <li class="list-inline-item">
-                    [% flag(sheet.flagUrl) %]
-                    <a href="[% sheet.url %]">[% IF sheet.name %][% sheet.name %][% ELSE %][% sheet.url %][% END %]</a>&nbsp;
-                </li>
-            [% END %]
-            </ul>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><strong>Informace: </strong></li>
+                [% FOREACH sheet = institution.factsheets %]
+                    <li class="list-inline-item">
+                        [% flag(sheet.flagUrl) %]
+                        <a href="[% sheet.url %]">[% IF sheet.name %][% sheet.name %][% ELSE %][% sheet.url %][% END %]</a>&nbsp;
+                    </li>
+                [% END %]
+                </ul>
             </div>
         </div>
         <hr/>
@@ -137,4 +166,9 @@
         </div>
         <hr/>
     [% END %]
+</div>
+
+<div class="container">
+    <h2>Organizační jednotky</h2>
+    <!-- TODO -->
 </div>
