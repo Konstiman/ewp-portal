@@ -241,7 +241,7 @@ sub getInstitutionData {
     $result{ otherNames } = \@otherNames;
     $result{ websites } = $self->getInstitutionWebsites($id);
     $result{ factsheets } = $self->getInstitutionFactsheets($id);
-    #$result{ contacts } = $self->getInstitutionContacts($id);
+    $result{ contacts } = $self->getInstitutionContacts($id);
     $result{ locationAddress } = $self->getAddress($result{ locationAddressId }) if $result{ locationAddressId };
     $result{ mailingAddress } = $self->getAddress($result{ mailingAddressId }) if $result{ mailingAddressId };
 
@@ -368,6 +368,120 @@ sub getInstitutionFactsheets {
         FROM    institution_factsheet inst
                 LEFT JOIN language lang ON inst.language = lang.id
         WHERE   inst.institution = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my @result = ();
+
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        push @result, $row;
+    }
+    $sth->finish();
+
+    return wantarray ? @result : \@result;
+}
+
+=head2 getInstitutionContacts
+
+Returns array of one particular institution's contacts.
+
+=cut
+
+sub getInstitutionContacts {
+    my $self = shift;
+    my $id   = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  contact
+        FROM    institution_contact
+        WHERE   institution = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my @result = ();
+
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        my $contactId = $row->{ contact } || next;
+        my $contact = $self->getContact($contactId);
+        push @result, $contact if $contact;
+    }
+    $sth->finish();
+
+    @result = sort { scalar( @{ $b->{ names } } ) <=> scalar( @{ $a->{ names } } ) } @result;
+
+    return wantarray ? @result : \@result;
+}
+
+=head2 getContact
+
+Returns information about one particular contact.
+
+=cut
+
+sub getContact {
+    my $self = shift;
+    my $id   = shift;
+
+    my %contact = ();
+    $contact{ names }  = $self->_getContactNames($id);
+    $contact{ emails } = $self->_getContactEmails($id);
+
+    #phones => $self->_getContactPhones($id),
+    #faxes => $self->_getContactFaxes($id),
+    #description => $self->_getContactDescri
+
+    return \%contact;
+}
+
+sub _getContactNames {
+    my $self = shift;
+    my $id   = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  con.name,
+                lang.flag_url flagUrl
+        FROM    contact_name con
+                LEFT JOIN language lang ON con.language = lang.id
+        WHERE   con.contact = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my @result = ();
+
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        push @result, $row;
+    }
+    $sth->finish();
+
+    return wantarray ? @result : \@result;
+}
+
+sub _getContactEmails {
+    my $self = shift;
+    my $id   = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  con.email
+        FROM    contact_email con
+        WHERE   con.contact = ?'
     );
 
     if ( !$sth || !$sth->execute($id) ) {

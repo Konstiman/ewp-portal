@@ -75,6 +75,24 @@
     </ul>
 [% END %]
 
+<!-- MACRO pro vlozeni kontaktu -->
+[% MACRO contactInList(contact) BLOCK  %]
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            [% FOREACH name = contact.names %]
+                [% flag(name.flagUrl) %]<strong>[% name.name %]</strong><br/>
+            [% END %]
+        </li>
+        [% IF contact.emails && contact.emails.size > 0 %]
+            <li class="list-group-item"><strong>E-mail: </strong>
+            [% FOREACH email = contact.emails %]
+                [% email.email %]<br/>
+            [% END %]
+            </li>
+        [% END %]
+    </ul>
+[% END %]
+
 <div class="container">
     [% IF institution.factsheets && institution.factsheets.size > 0 %]
         <div class="row">
@@ -103,6 +121,17 @@
             [% IF institution.mailingAddress %]
                 <div class="col-sm-6">
                     [% addressInList(institution.mailingAddress, 'Doručovací adresa') %]
+                </div>
+            [% END %]
+        </div>
+        <hr/>
+    [% END %]
+
+    [% IF institution.contacts && institution.contacts.size > 0 %]
+        <div class="row">
+            [% FOREACH contact = institution.contacts %]
+                <div class="col-sm-4">
+                    [% contactInList(contact) %]
                 </div>
             [% END %]
         </div>
