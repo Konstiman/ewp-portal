@@ -46,11 +46,13 @@ sub list :Local :Args(0) {
     my ( $self, $c ) = @_;
 
     my $parameters = $c->request->parameters;
-    if ( $parameters->{ 'countryFilter' } ) {
+    my %filter = ();
+    if ( $parameters->{ 'countryFilter' } && $parameters->{ 'countryFilter' } =~ /^\d+$/ ) {
+        $filter{ country } = $parameters->{ 'countryFilter' };
         $c->stash(filteredCountry => $parameters->{ 'countryFilter' });
     }
 
-    my @institutions = $c->model('DBIModel')->getInstitutionsListData();
+    my @institutions = $c->model('DBIModel')->getInstitutionsListData(\%filter);
     $c->stash(institutions => \@institutions);
 
     my @countries = $c->model('DBIModel')->getInstitutionCountriesData();

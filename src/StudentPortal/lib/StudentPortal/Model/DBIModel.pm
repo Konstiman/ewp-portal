@@ -32,14 +32,24 @@ DBI Model Class.
 Returns list with all institutions and their basic data:
 id, identifier, names, abbreviation, logo, locality and country.
 
+Takes one parameter: hash with filter options.
+
 =cut
 
 sub getInstitutionsListData {
-    my $self = shift;
+    my $self   = shift;
+    my $filter = shift;
 
     my $dbh = $self->dbh;
 
-    my $sth = $dbh->prepare('
+    my $where  = '';
+    my @params = ();
+    if ( $filter && $filter->{ country } ) {
+        $where = 'WHERE country.id = ?';
+        push @params, $filter->{ country };
+    }
+
+    my $sth = $dbh->prepare("
         SELECT  inst.id,
                 inst.identifier,
                 names.name,
@@ -47,15 +57,16 @@ sub getInstitutionsListData {
                 inst.abbreviation,
                 inst.logo_url,
                 addr.locality,
-                country.name_cz country_cz 
+                country.name_cz country_cz
         FROM    institution inst
                 INNER JOIN institution_name names ON inst.id = names.institution
                 LEFT JOIN language lang ON names.language = lang.id
                 LEFT JOIN address addr ON inst.location_address = addr.id
-                LEFT JOIN country ON addr.country = country.id'
+                LEFT JOIN country ON addr.country = country.id
+        $where"
     );
 
-    if ( !$sth || !$sth->execute() ) {
+    if ( !$sth || !$sth->execute(@params) ) {
         warn "fail: " . $dbh->errstr();
         return wantarray ? () : [];
     }
@@ -233,6 +244,12 @@ sub getInstitutionData {
 
     return \%result;
 }
+
+=head2 getInstitutionCities
+
+Returns array of hashes with information about institutions home city and country.
+
+=cut
 
 sub getInstitutionCities {
     my $self = shift;
