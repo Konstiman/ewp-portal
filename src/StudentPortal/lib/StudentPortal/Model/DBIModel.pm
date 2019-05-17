@@ -240,7 +240,7 @@ sub getInstitutionData {
     $result{ name } = $mainName;
     $result{ otherNames } = \@otherNames;
     $result{ websites } = $self->getInstitutionWebsites($id);
-    #$result{ facsheets } = $self->getInstitutionFactsheets($id);
+    $result{ factsheets } = $self->getInstitutionFactsheets($id);
     #$result{ contacts } = $self->getInstitutionContacts($id);
     $result{ locationAddress } = $self->getAddress($result{ locationAddressId }) if $result{ locationAddressId };
     $result{ mailingAddress } = $self->getAddress($result{ mailingAddressId }) if $result{ mailingAddressId };
@@ -329,6 +329,43 @@ sub getInstitutionWebsites {
                 lang.abbreviation lang,
                 lang.flag_url flagUrl
         FROM    institution_website inst
+                LEFT JOIN language lang ON inst.language = lang.id
+        WHERE   inst.institution = ?'
+    );
+
+    if ( !$sth || !$sth->execute($id) ) {
+        warn "fail: " . $dbh->errstr();
+        return undef;
+    }
+
+    my @result = ();
+
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        push @result, $row;
+    }
+    $sth->finish();
+
+    return wantarray ? @result : \@result;
+}
+
+=head2 getInstitutionFactsheets
+
+Returns array of one particular institution's factsheets.
+
+=cut
+
+sub getInstitutionFactsheets {
+    my $self = shift;
+    my $id   = shift;
+
+    my $dbh = $self->dbh;
+
+    my $sth = $dbh->prepare('
+        SELECT  inst.url,
+                inst.name,
+                lang.abbreviation lang,
+                lang.flag_url flagUrl
+        FROM    institution_factsheet inst
                 LEFT JOIN language lang ON inst.language = lang.id
         WHERE   inst.institution = ?'
     );

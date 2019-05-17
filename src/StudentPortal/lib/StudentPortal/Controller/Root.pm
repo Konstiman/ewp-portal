@@ -74,6 +74,8 @@ sub institution :Local :Args(1) {
 
     $c->stash(institution => $institution);
 
+    warn Dumper $institution;
+
     $c->stash(template => 'institution.tt2')
 }
 

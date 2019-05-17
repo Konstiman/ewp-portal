@@ -47,10 +47,80 @@
             </div>
         </div>
     </div>
+    <hr/>
 </div>
 
 <div class="container">
-    <div class="row">
-        
-    </div>
+    [% IF institution.factsheets && institution.factsheets.size > 0 %]
+        <div class="row">
+            <div class="col-12">
+            <ul class="list-inline">
+                <li class="list-inline-item"><strong>Informace: </strong></li>
+            [% FOREACH sheet = institution.factsheets %]
+                <li class="list-inline-item">
+                    [% IF sheet.flagUrl %]
+                        <img src="[% sheet.flagUrl %]" style="width: 1.2rem; height: 0.8rem; border: 1px solid black"/>
+                    [% ELSE %]
+                        <svg style="width: 1.2rem; height: 0.8rem"/>
+                            <rect style="fill:rgb(0,255,255); width: 1.2rem; height: 0.8rem"/>
+                        </svg>
+                    [% END %]
+                    <a href="[% sheet.url %]">[% IF sheet.name %][% sheet.name %][% ELSE %][% sheet.url %][% END %]</a>&nbsp;
+                </li>
+            [% END %]
+            </ul>
+            </div>
+        </div>
+        <hr/>
+    [% END %]
+
+    [% IF institution.locationAddress || institution.mailingAddress %]
+        <div class="row">
+            [% IF institution.locationAddress %]
+                [% laddr = institution.locationAddress %]
+                <div class="col-sm-6">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Hlavní adresa:</strong></li>
+                        [% IF laddr.recipient %]<li class="list-group-item">[% laddr.recipient %]</li>[% END %]
+                        [% IF laddr.addressLines %]<li class="list-group-item">[% laddr.addressLines %]</li>[% END %]
+                        [% IF laddr.streetName && (laddr.buildingNumber || laddr.buildingName) %]
+                            <li class="list-group-item">[% laddr.buildingName %] [% laddr.streetName %] [% laddr.buildingNumber %]</li>
+                        [% END %]
+                        [% IF laddr.unit %]<li class="list-group-item">jednotka: [% laddr.unit %]</li>[% END %]
+                        [% IF laddr.floor %]<li class="list-group-item">podlaží: [% laddr.floor %]</li>[% END %]
+                        [% IF laddr.pobox %]<li class="list-group-item">pobox: [% laddr.pobox %]</li>[% END %]
+                        [% IF laddr.deliveryPoint %]<li class="list-group-item">místo doručení: [% laddr.deliveryPoint %]</li>[% END %]
+                        [% IF laddr.postalCode || laddr.locality %]
+                            <li class="list-group-item">[% laddr.postalCode %] [% laddr.locality %]</li>
+                        [% END %]
+                        [% IF laddr.region %]<li class="list-group-item">[% laddr.region %]</li>[% END %]
+                        [% IF laddr.country %]<li class="list-group-item">[% laddr.country %]</li>[% END %]
+                    </ul>
+                </div>
+            [% END %]
+            [% IF institution.mailingAddress %]
+                [% maddr = institution.mailingAddress %]
+                <div class="col-sm-6">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Doručovací adresa:</strong></li>
+                        [% IF maddr.recipient %]<li class="list-group-item">[% maddr.recipient %]</li>[% END %]
+                        [% IF maddr.addressLines %]<li class="list-group-item">[% maddr.addressLines %]</li>[% END %]
+                        [% IF maddr.streetName && (maddr.buildingNumber || maddr.buildingName) %]
+                            <li class="list-group-item">[% maddr.buildingName %] [% maddr.streetName %] [% maddr.buildingNumber %]</li>
+                        [% END %]
+                        [% IF maddr.unit %]<li class="list-group-item">jednotka: [% maddr.unit %]</li>[% END %]
+                        [% IF maddr.floor %]<li class="list-group-item">podlaží: [% maddr.floor %]</li>[% END %]
+                        [% IF maddr.pobox %]<li class="list-group-item">pobox: [% maddr.pobox %]</li>[% END %]
+                        [% IF maddr.deliveryPoint %]<li class="list-group-item">místo doručení: [% maddr.deliveryPoint %]</li>[% END %]
+                        [% IF maddr.postalCode || maddr.locality %]
+                            <li class="list-group-item">[% maddr.postalCode %] [% maddr.locality %]</li>
+                        [% END %]
+                        [% IF maddr.region %]<li class="list-group-item">[% maddr.region %]</li>[% END %]
+                        [% IF maddr.country %]<li class="list-group-item">[% maddr.country %]</li>[% END %]
+                    </ul>
+                </div>
+            [% END %]
+        </div>
+        <hr/>
+    [% END %]
 </div>
