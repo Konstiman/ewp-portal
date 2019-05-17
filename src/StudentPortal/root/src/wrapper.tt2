@@ -35,12 +35,11 @@
                 </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav mr-auto">
-                            <!-- TODO pridat active tomu odkazu co je zrovna active -->
                             <li class="nav-item">
-                                <a class="nav-link" href="/map">mapa</a>
+                                <a class="nav-link [% IF template.name == 'map.tt2' %] active [% END %]" href="/map">mapa</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="/list">seznam</a>
+                                <a class="nav-link [% IF template.name == 'list.tt2' %] active [% END %]" href="/list">seznam</a>
                             </li>
                         </ul>
                     <form action="/list" class="form-inline mt-2 mt-md-0 input-group-sm btn-group-sm">
