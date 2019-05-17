@@ -56,11 +56,7 @@
                         </svg>
                     [% END %]
                     <div class="content-heading" style="margin-top: 15px;">
-                        [% IF inst.nameEN %]
-                             <h2>[% inst.nameEN %]</h2>
-                        [% ELSE %]
-                            <h2>[% inst.names.first %]</h2>
-                        [% END %]
+                        <h2>[% inst.mainName %]</h2>
                         <p>[% inst.city %], [% inst.country %]<br>
                         <a href="/institution/[% inst.identifier %]">více informací...</a></p>
                     </div>

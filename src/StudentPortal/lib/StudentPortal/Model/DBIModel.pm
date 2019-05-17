@@ -89,13 +89,16 @@ sub getInstitutionsListData {
         }
 
         if ( $row->{'abbr_lang'} && $row->{'abbr_lang'} eq 'en' ) {
-            $id2Inst{ $identifier }->{ nameEN } = $row->{'name'};
+            $id2Inst{ $identifier }->{ mainName } = $row->{'name'};
         }
     }
     $sth->finish();
 
     my @institutions = ( values %id2Inst );
-    @institutions = sort { $a->{ id } <=> $b->{ id } } @institutions;
+    foreach my $inst (@institutions) {
+        $inst->{ mainName } = shift @{ $inst->{ names } } if !$inst->{ mainName };
+    }
+    @institutions = sort { $a->{ mainName } cmp $b->{ mainName } } @institutions;
 
     return wantarray ? @institutions : \@institutions;
 }
@@ -260,10 +263,7 @@ sub getInstitutionCities {
 
     foreach my $inst ( @institutions ) {
         my $ident = $inst->{ identifier };
-        my $name  = $inst->{ nameEN };
-        if (!$name) {
-            $name = shift @{ $inst->{ names } };
-        }
+        my $name  = $inst->{ mainName };
         my $city    = $inst->{ city }    || '';
         my $country = $inst->{ country } || '';
         push @result, {
