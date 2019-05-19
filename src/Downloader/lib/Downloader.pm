@@ -22,7 +22,6 @@ use HTTP::Request;
 use LWP::UserAgent;
 use Manager::EntityManager;
 use XML::LibXML;
-use XML::LibXML::PrettyPrint;
 
 use constant CATALOGUE_URL => 'https://registry.erasmuswithoutpaper.eu/catalogue-v1.xml';
 
