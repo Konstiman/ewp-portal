@@ -6,6 +6,7 @@ use lib './lib/';
 
 use Data::Dumper;
 use Downloader;
+use File::Slurp;
 
 my $downloader = Downloader->new();
 
@@ -19,8 +20,15 @@ my $heis2endpoints = $downloader->parseCatalogueXML($xml);
 
 my ( $statsSkipped, $statsDownloaded, $statsSaved, $statsUnsaved ) = ( 0, 0, 0, 0 );
 
-my $dsn = "DBI:mysql:database=ewpportal;host=localhost;port=3306";
-my $dbh = DBI->connect( $dsn, 'ewpportal', 'ewpportal', { mysql_enable_utf8 => 1 } );
+my @config = read_file( '../config' );
+my $dsn    = $config[0];
+my $user   = $config[1];
+my $passwd = $config[2];
+
+chomp( $dsn, $user, $passwd );
+
+#my $dsn = "DBI:mysql:database=ewpportal;host=localhost;port=3306";
+my $dbh = DBI->connect( $dsn, $user, $passwd, { mysql_enable_utf8 => 1 } );
 
 my $manager = Manager::EntityManager->new( dbh => $dbh );
 

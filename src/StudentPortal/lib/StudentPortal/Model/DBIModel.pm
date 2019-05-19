@@ -4,10 +4,19 @@ use strict;
 use warnings;
 use parent 'Catalyst::Model::DBI';
 
+use File::Slurp;
+
+my @config = read_file( '../../config' );
+my $dsn    = $config[0];
+my $user   = $config[1];
+my $passwd = $config[2];
+
+chomp( $dsn, $user, $passwd );
+
 __PACKAGE__->config(
-    dsn           => 'dbi:mysql:ewpportal',
-    user          => 'ewpportal',
-    password      => 'ewpportal',
+    dsn           => $dsn,
+    user          => $user,
+    password      => $passwd,
     options       => {
         mysql_enable_utf8 => 1
     },
