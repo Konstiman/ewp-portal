@@ -4,6 +4,7 @@ print <<EOF;
 Vitejte v instalatoru Studentskeho portalu pro EWP. Prosim overte, ze vas system splnuje nasledujici pozadavky:
 
  - unixovy operacni system (doporucene je Ubuntu ve verzi 18.04.2)
+ - zakladni nastroje (make, gcc...) - sudo apt-get install build-essential
  - Perl 5 (doporucena verze: 5.26)
  - cpan (doporucena verze: 2.26)
  - MySQL (doporucena verze: 5.7.26) se zalozenou databazi (je treba znat DSN, prihlasovaci jmeno a heslo)
@@ -20,6 +21,7 @@ if ( $start && $start !~ /^[ya]/i ) {
 
 print <<EOF;
 Pripravuji instalaci. Budou instalovany nasledujici moduly:
+- DBD::mysql
 - LWP::UserAgent
 - HTTP::Request
 - XML::LibXML
@@ -41,7 +43,7 @@ Byla preskocena instalace modulu.
 EOF
 }
 else {
-	system 'cpan LWP::UserAgent HTTP::Request XML::LibXML'
+	system 'cpan DBD::mysql LWP::UserAgent HTTP::Request XML::LibXML'
 		. ' Moose File::Slurp Catalyst::Runtime Catalyst::Devel';
 
 	if ($? == -1) {
