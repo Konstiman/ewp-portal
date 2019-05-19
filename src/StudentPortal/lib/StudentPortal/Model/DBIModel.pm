@@ -6,7 +6,7 @@ use parent 'Catalyst::Model::DBI';
 
 use File::Slurp;
 
-my @config = read_file( '../../config' );
+my @config = read_file( '../config' );
 my $dsn    = $config[0];
 my $user   = $config[1];
 my $passwd = $config[2];
