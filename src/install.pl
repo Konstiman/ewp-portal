@@ -4,10 +4,13 @@ print <<EOF;
 Vitejte v instalatoru Studentskeho portalu pro EWP. Prosim overte, ze vas system splnuje nasledujici pozadavky:
 
  - unixovy operacni system (doporucene je Ubuntu ve verzi 18.04.2)
- - zakladni nastroje (make, gcc...) - sudo apt-get install build-essential
+ - zakladni nastroje (sudo apt-get install build-essential)
+ - libssl-dev (sudo apt-get install libssl-dev)
  - Perl 5 (doporucena verze: 5.26)
  - cpan (doporucena verze: 2.26)
+ - mysql server (sudo apt-get install mysql-server)
  - MySQL (doporucena verze: 5.7.26) se zalozenou databazi (je treba znat DSN, prihlasovaci jmeno a heslo)
+ - konfiguracni soubory k mysql (sudo apt-get install libmysqlclient-dev)
 
 Chcete pokracovat? ([ANO]/ne)
 EOF
