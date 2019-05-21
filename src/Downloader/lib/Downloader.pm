@@ -27,7 +27,7 @@ use constant CATALOGUE_URL => 'https://registry.erasmuswithoutpaper.eu/catalogue
 
 use constant DEV_CATALOGUE_URL => 'https://dev-registry.erasmuswithoutpaper.eu/catalogue-v1.xml';
 
-use constant DEVEL_MODE => 1;
+use constant DEVEL_MODE => 0;
 
 use constant VERSION => '1.0.0';
 
