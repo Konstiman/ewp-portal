@@ -18,10 +18,8 @@ __PACKAGE__->config(
     user     => $user,
     password => $passwd,
     options  => {
-        mysql_enable_utf8    => 1,
-        mysql_auto_reconnect => 1
-    },
-    mysql_auto_reconnect => 1
+        mysql_enable_utf8 => 1
+    }
 );
 
 =head1 NAME
@@ -34,7 +32,7 @@ See L<StudentPortal>
 
 =head1 DESCRIPTION
 
-DBI Model Class.
+DBI Model Class. Main data model for Student Portal.
 
 =head1 METHODS
 
@@ -210,14 +208,13 @@ sub getInstitutionData {
                 inst.location_address locationAddressId,
                 inst.mailing_address mailingAddressId
         FROM    institution inst
-        WHERE   inst.identifier = ?', $ident
-    );
+        WHERE   inst.identifier = ?', $ident );
 
     if ( !@data || !$data[0] ) {
         return undef;
     }
 
-    my %result = %{$data[0]};
+    my %result = %{ $data[0] };
 
     my $id         = $data[0]->{id};
     my @names      = $self->getInstitutionNames($id);
@@ -294,8 +291,7 @@ sub getInstitutionNames {
                 lang.flag_url flagUrl
         FROM    institution_name inst
                 LEFT JOIN language lang ON inst.language = lang.id
-        WHERE   inst.institution = ?', $id
-    );
+        WHERE   inst.institution = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -316,8 +312,7 @@ sub getInstitutionWebsites {
                 lang.flag_url flagUrl
         FROM    institution_website inst
                 LEFT JOIN language lang ON inst.language = lang.id
-        WHERE   inst.institution = ?', $id
-    );
+        WHERE   inst.institution = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -341,8 +336,7 @@ sub getInstitutionFactsheets {
                 lang.flag_url flagUrl
         FROM    institution_factsheet inst
                 LEFT JOIN language lang ON inst.language = lang.id
-        WHERE   inst.institution = ?', $id
-    );
+        WHERE   inst.institution = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -360,12 +354,11 @@ sub getInstitutionContacts {
     my @data = $self->simpleSelect( '
         SELECT  contact
         FROM    institution_contact
-        WHERE   institution = ?', $id
-    );
+        WHERE   institution = ?', $id );
 
     my @result = ();
 
-    foreach my $row ( @data ) {
+    foreach my $row (@data) {
         my $contactId = $row->{contact} || next;
         my $contact   = $self->getContact($contactId);
         push @result, $contact if $contact;
@@ -404,8 +397,7 @@ sub _getContactNames {
                 lang.flag_url flagUrl
         FROM    contact_name con
                 LEFT JOIN language lang ON con.language = lang.id
-        WHERE   con.contact = ?', $id
-    );
+        WHERE   con.contact = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -417,8 +409,7 @@ sub _getContactEmails {
     my @result = $self->simpleSelect( '
         SELECT  con.email
         FROM    contact_email con
-        WHERE   con.contact = ?', $id
-    );
+        WHERE   con.contact = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -430,8 +421,7 @@ sub _getContactPhones {
     my @result = $self->simpleSelect( '
         SELECT  con.phoneNumber
         FROM    contact_phone con
-        WHERE   con.contact = ?', $id
-    );
+        WHERE   con.contact = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -443,8 +433,7 @@ sub _getContactFaxes {
     my @result = $self->simpleSelect( '
         SELECT  con.faxNumber
         FROM    contact_fax con
-        WHERE   con.contact = ?', $id
-    );
+        WHERE   con.contact = ?', $id );
 
     return wantarray ? @result : \@result;
 }
@@ -458,15 +447,14 @@ sub _getContactDescription {
                 lang.flag_url flagUrl
         FROM    contact_description con
                 LEFT JOIN language lang ON con.language = lang.id
-        WHERE   con.contact = ?', $id
-    );
+        WHERE   con.contact = ?', $id );
 
     return wantarray ? @result : \@result;
 }
 
 =head1 AUTHOR
 
-Jan Konstant,,,
+Jan Konstant
 
 =head1 LICENSE
 
