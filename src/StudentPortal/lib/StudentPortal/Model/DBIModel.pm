@@ -36,7 +36,7 @@ DBI Model Class. Main data model for Student Portal.
 
 =head1 METHODS
 
-=head2 simpleSelect
+=head2 C<simpleSelect (query : Str, parameters : Array[Str]) : ArrayRef[HashRef[Str]]>
 
 Wrapper method for select procedure that repeats in every db call.
 
@@ -67,7 +67,7 @@ sub simpleSelect {
     return wantarray ? @result : \@result;
 }
 
-=head2 getInstitutionsListData
+=head2 C<getInstitutionsListData () : ArrayRef[HashRef[Str]]>
 
 Returns list with all institutions and their basic data:
 id, identifier, names, abbreviation, logo, locality and country.
@@ -134,7 +134,7 @@ sub getInstitutionsListData {
     return wantarray ? @institutions : \@institutions;
 }
 
-=head2 getInstitutionCountriesData
+=head2 C<getInstitutionCountriesData () : ArrayRef[HashRef[Str]]>
 
 Returns list with all countries with at least one institution. Each entry
 contains country id and country name.
@@ -156,7 +156,7 @@ sub getInstitutionCountriesData {
     return wantarray ? @result : \@result;
 }
 
-=head2 getInstitutionData
+=head2 C<getAddress ( id : Int ) : HashRef[Str]>
 
 Returns hash with information about the address specified by parameter.
 
@@ -191,15 +191,15 @@ sub getAddress {
     return $data[0];
 }
 
-=head2 getInstitutionData
+=head2 C<getInstitutionInformation ( identifier : Str ) : HashRef[Item]>
 
 Returns hash with information about one particular institution.
 
 =cut
 
-sub getInstitutionData {
-    my $self  = shift;
-    my $ident = shift;
+sub getInstitutionInformation {
+    my $self       = shift;
+    my $identifier = shift;
 
     my @data = $self->simpleSelect( '
         SELECT  inst.id,
@@ -208,7 +208,7 @@ sub getInstitutionData {
                 inst.location_address locationAddressId,
                 inst.mailing_address mailingAddressId
         FROM    institution inst
-        WHERE   inst.identifier = ?', $ident );
+        WHERE   inst.identifier = ?', $identifier );
 
     if ( !@data || !$data[0] ) {
         return undef;
@@ -217,7 +217,7 @@ sub getInstitutionData {
     my %result = %{ $data[0] };
 
     my $id         = $data[0]->{id};
-    my @names      = $self->getInstitutionNames($id);
+    my @names      = $self->_getInstitutionNames($id);
     my $mainName   = '';
     my @otherNames = ();
     foreach my $nameRef (@names) {
@@ -235,13 +235,12 @@ sub getInstitutionData {
 
     $result{name}            = $mainName;
     $result{otherNames}      = \@otherNames;
-    $result{websites}        = $self->getInstitutionWebsites($id);
-    $result{factsheets}      = $self->getInstitutionFactsheets($id);
-    $result{contacts}        = $self->getInstitutionContacts($id);
+    $result{websites}        = $self->_getInstitutionWebsites($id);
+    $result{factsheets}      = $self->_getInstitutionFactsheets($id);
+    $result{contacts}        = $self->_getInstitutionContacts($id);
     $result{locationAddress} = $self->getAddress( $result{locationAddressId} ) if $result{locationAddressId};
     $result{mailingAddress}  = $self->getAddress( $result{mailingAddressId} ) if $result{mailingAddressId};
-
-    # TODO organizational units
+    $result{units}           = $self->_getInstitutionUnits($id);
 
     return \%result;
 }
@@ -275,13 +274,7 @@ sub getInstitutionCities {
     return wantarray ? @result : \@result;
 }
 
-=head2 getInstitutionNames
-
-Returns array of one particular institution's names.
-
-=cut
-
-sub getInstitutionNames {
+sub _getInstitutionNames {
     my $self = shift;
     my $id   = shift;
 
@@ -296,13 +289,7 @@ sub getInstitutionNames {
     return wantarray ? @result : \@result;
 }
 
-=head2 getInstitutionWebsites
-
-Returns array of one particular institution's websites.
-
-=cut
-
-sub getInstitutionWebsites {
+sub _getInstitutionWebsites {
     my $self = shift;
     my $id   = shift;
 
@@ -317,13 +304,7 @@ sub getInstitutionWebsites {
     return wantarray ? @result : \@result;
 }
 
-=head2 getInstitutionFactsheets
-
-Returns array of one particular institution's factsheets.
-
-=cut
-
-sub getInstitutionFactsheets {
+sub _getInstitutionFactsheets {
     my $self = shift;
     my $id   = shift;
 
@@ -341,13 +322,7 @@ sub getInstitutionFactsheets {
     return wantarray ? @result : \@result;
 }
 
-=head2 getInstitutionContacts
-
-Returns array of one particular institution's contacts.
-
-=cut
-
-sub getInstitutionContacts {
+sub _getInstitutionContacts {
     my $self = shift;
     my $id   = shift;
 
@@ -448,6 +423,117 @@ sub _getContactDescription {
         FROM    contact_description con
                 LEFT JOIN language lang ON con.language = lang.id
         WHERE   con.contact = ?', $id );
+
+    return wantarray ? @result : \@result;
+}
+
+sub _getInstitutionUnits {
+    my $self        = shift;
+    my $institution = shift;
+
+    my @units = $self->simpleSelect( '
+        SELECT  id,
+                code,
+                abbreviation,
+                logo_url logoUrl,
+                location_address locationAddressId,
+                mailing_address mailingAddressId
+        FROM    unit
+        WHERE   institution = ?', $institution );
+
+    foreach my $unit (@units) {
+        my @names    = $self->_getUnitNames( $unit->{id} );
+        my $mainName = shift @names;
+
+        $unit->{name}            = $mainName->{name};
+        $unit->{otherNames}      = \@names;
+        $unit->{locationAddress} = $self->getAddress( $unit->{locationAddressId} );
+        $unit->{mailingAddress}  = $self->getAddress( $unit->{mailingAddressId} );
+        $unit->{websites}        = $self->_getUnitWebsites( $unit->{id} );
+        $unit->{factsheets}      = $self->_getUnitFactsheets( $unit->{id} );
+        $unit->{contacts}        = $self->_getUnitContacts($unit->{id});
+    }
+
+    return wantarray ? @units : \@units;
+}
+
+sub _getUnitNames {
+    my $self = shift;
+    my $id   = shift;
+
+    my @result = $self->simpleSelect( '
+        SELECT  unit.name,
+                lang.abbreviation lang,
+                lang.flag_url flagUrl
+        FROM    unit_name unit
+                LEFT JOIN language lang ON unit.language = lang.id
+        WHERE   unit.unit = ?', $id );
+
+    my $mainName   = '';
+    my @otherNames = ();
+
+    foreach my $row (@result) {
+        if ( $row->{lang} && lc $row->{lang} eq 'en' ) {
+            $mainName = $row;
+        }
+        else {
+            push @otherNames, $row;
+        }
+    }
+
+    @result = @otherNames;
+    unshift @result, $mainName if $mainName;
+
+    return wantarray ? @result : \@result;
+}
+
+sub _getUnitWebsites {
+    my $self = shift;
+    my $id   = shift;
+
+    my @result = $self->simpleSelect( '
+        SELECT  unit.url,
+                lang.abbreviation lang,
+                lang.flag_url flagUrl
+        FROM    unit_website unit
+                LEFT JOIN language lang ON unit.language = lang.id
+        WHERE   unit.unit = ?', $id );
+
+    return wantarray ? @result : \@result;
+}
+
+sub _getUnitFactsheets {
+    my $self = shift;
+    my $id   = shift;
+
+    my @result = $self->simpleSelect( '
+        SELECT  unit.url,
+                unit.name,
+                lang.abbreviation lang,
+                lang.flag_url flagUrl
+        FROM    unit_factsheet unit
+                LEFT JOIN language lang ON unit.language = lang.id
+        WHERE   unit.unit = ?', $id );
+
+    return wantarray ? @result : \@result;
+}
+
+sub _getUnitContacts {
+    my $self = shift;
+    my $id   = shift;
+
+    my @data = $self->simpleSelect( '
+        SELECT  contact
+        FROM    unit_contact
+        WHERE   unit = ?', $id );
+
+    my @result = ();
+
+    foreach my $row (@data) {
+        my $contactId = $row->{contact} || next;
+        my $contact   = $self->getContact($contactId);
+        push @result, $contact if $contact;
+    }
 
     return wantarray ? @result : \@result;
 }

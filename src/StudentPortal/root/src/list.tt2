@@ -45,15 +45,13 @@
     [% FOREACH institution = institutions %]
         <div class="row">
             <div class="col-sm-2">
-                [% IF institution.logoUrl %]
-                    <div style="width: 150px; height: 150px; text-align: center;">
+                <div style="width: 150px; height: 150px; text-align: center;">
+                    [% IF institution.logoUrl %]
                         <img style="max-width: 150px; max-height: 150px;" src="[% institution.logoUrl %]"/>
-                    </div>
-                [% ELSE %]
-                    <svg style="width: 150px;">
-                        <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
-                    </svg>
-                [% END %]
+                    [% ELSE %]
+                        <img src="/static/images/institution_logo.png"/>
+                    [% END %]
+                </div>
             </div>
             <div class="col-sm-10" style="margin-top: 1.5rem;">
                 <h2>[% institution.mainName %]</h2>

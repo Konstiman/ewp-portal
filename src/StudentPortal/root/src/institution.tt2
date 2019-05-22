@@ -20,15 +20,13 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-2">
-            [% IF institution.logoUrl %]
-                <div style="width: 150px; height: 150px;">
+            <div style="width: 150px; height: 150px;">
+                [% IF institution.logoUrl %]    
                     <img style="max-width: 150px; max-height: 150px;" src="[% institution.logoUrl %]"/>
-                </div>
-            [% ELSE %]
-                <svg style="width: 150px;">
-                    <rect width="150" height="150" style="fill:rgb(255,255,255);"/>
-                </svg>
-            [% END %]
+                [% ELSE %]
+                    <img src="/static/images/institution_logo.png"/>
+                [% END %]
+            </div>
         </div>
         <div class="col-sm-10" style="margin-top: 1.5rem;">
                 <h1>
@@ -169,6 +167,86 @@
 </div>
 
 <div class="container">
-    <h2>Organizační jednotky</h2>
-    <!-- TODO -->
+    [% IF institution.units && institution.units.size > 0 %]
+        <h2>Organizační jednotky</h2>
+        <div class="container">
+            [% FOREACH unit = institution.units %]
+                <div class="row">
+                    <div class="col-sm-1">
+                        <div style="width: 80px; height: 80px;">
+                            [% IF unit.logoUrl %]
+                                <img style="max-width: 80px; max-height: 80px;" src="[% unit.logoUrl %]"/>
+                            [% ELSE %]
+                                <img src="/static/images/unit_logo.png"/>
+                            [% END %]
+                        </div>
+                    </div>
+                    <div class="col-sm-11" style="margin-top: 1rem;">
+                            <h3>
+                                [% unit.name %]
+                                [% IF unit.abbreviation %]
+                                    ([% unit.abbreviation %])
+                                [% END %]
+                            </h1>
+                            <p>
+                                [% FOREACH otherName = unit.otherNames %]
+                                    [% flag(otherName.flagUrl) %]
+                                    [% otherName.name %]<br>
+                                [% END %]
+                            </p>
+                    </div>
+                </div>
+
+                [% IF (unit.websites && unit.websites.size > 0) || (unit.factsheets && unit.factsheets.size > 0) %]
+                    <div class="row">
+                        <div class="col-12">
+                            <ul class="list-inline">
+                                <li class="list-inline-item"><strong>Informace: </strong></li>
+                            [% FOREACH web = unit.websites %]
+                                <li class="list-inline-item">
+                                    [% flag(web.flagUrl) %]
+                                    <a href="[% web.url %]">[% web.url %]</a>&nbsp;
+                                </li>
+                            [% END %]
+                            [% FOREACH sheet = unit.factsheets %]
+                                <li class="list-inline-item">
+                                    [% flag(sheet.flagUrl) %]
+                                    <a href="[% sheet.url %]">[% IF sheet.name %][% sheet.name %][% ELSE %][% sheet.url %][% END %]</a>&nbsp;
+                                </li>
+                            [% END %]
+                            </ul>
+                        </div>
+                    </div>
+                [% END %]
+
+                [% IF unit.locationAddress || unit.mailingAddress %]
+                    <div class="row">
+                        [% IF unit.locationAddress %]
+                            <div class="col-sm-6">
+                                [% addressInList(unit.locationAddress, 'Hlavní adresa') %]
+                            </div>
+                        [% END %]
+                        [% IF unit.mailingAddress %]
+                            <div class="col-sm-6">
+                                [% addressInList(unit.mailingAddress, 'Doručovací adresa') %]
+                            </div>
+                        [% END %]
+                    </div>
+                [% END %]
+
+                [% IF unit.contacts && unit.contacts.size > 0 %]
+                    <div class="row">
+                        [% FOREACH contact = unit.contacts %]
+                            <div class="col-sm-4">
+                                [% contactInList(contact) %]
+                            </div>
+                        [% END %]
+                    </div>
+                    <hr/>
+                [% END %]
+                <hr/>
+            [% END %]
+        </div>
+        <hr/>
+    [% END %]
 </div>

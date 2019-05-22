@@ -18,8 +18,8 @@ EOF
 my $start = <>;
 
 if ( $start && $start !~ /^[ya]/i ) {
-	print "Instalace prerusena.\n";
-	exit;
+    print "Instalace prerusena.\n";
+    exit;
 }
 
 print <<EOF;
@@ -41,27 +41,26 @@ EOF
 my $install = <>;
 
 if ( $install && $install !~ /^[ya]/i ) {
-	print <<EOF;
+    print <<EOF;
 Byla preskocena instalace modulu.
 EOF
 }
 else {
-	system 'cpan DBD::mysql LWP::UserAgent HTTP::Request XML::LibXML'
+    system 'cpan DBD::mysql LWP::UserAgent HTTP::Request XML::LibXML' 
 		. ' Moose File::Slurp Catalyst::Runtime Catalyst::Devel';
 
-	if ($? == -1) {
-		print "\nInstalace se nezdarila: $!\n";
-	}
-	elsif ($? & 127) {
-		printf "\nInstalace se nezdarila, skoncila se signalem %d (%s coredump).\n",
-			($? & 127),  ($? & 128) ? 'with' : 'without';
-	}
-	elsif ($? == 0) {
-		printf "\nModuly byly uspesne nainstalovany.\n";
-	}
-	else {
-		printf "\nInstalace skoncila s hodnotou %d\n.", $? >> 8;
-	}
+    if ( $? == -1 ) {
+        print "\nInstalace se nezdarila: $!\n";
+    }
+    elsif ( $? & 127 ) {
+        printf "\nInstalace se nezdarila, skoncila se signalem %d (%s coredump).\n", ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
+    }
+    elsif ( $? == 0 ) {
+        printf "\nModuly byly uspesne nainstalovany.\n";
+    }
+    else {
+        printf "\nInstalace skoncila s hodnotou %d\n.", $? >> 8;
+    }
 }
 
 print <<EOF;
@@ -72,22 +71,22 @@ EOF
 
 print "DSN: ";
 my $dsn = <>;
-chomp( $dsn );
+chomp($dsn);
 
 print "nazev databaze: ";
 my $db = <>;
-chomp( $db );
+chomp($db);
 
 print "prihlasovaci jmeno: ";
 my $user = <>;
-chomp( $user );
+chomp($user);
 
 print "heslo: ";
 my $passw = <>;
-chomp( $passw );
+chomp($passw);
 
 my $filename = 'config';
-open(my $fh, '>', $filename) || die "Nepodarilo se vytvorit soubor '$filename': $!";
+open( my $fh, '>', $filename ) || die "Nepodarilo se vytvorit soubor '$filename': $!";
 print $fh "$dsn\n$user\n$passw\n";
 close $fh;
 
