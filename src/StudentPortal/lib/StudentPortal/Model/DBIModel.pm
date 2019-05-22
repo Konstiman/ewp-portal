@@ -454,6 +454,8 @@ sub _getInstitutionUnits {
         $unit->{contacts}        = $self->_getUnitContacts($unit->{id});
     }
 
+    @units = sort { $a->{name} cmp $b->{name} } @units;
+
     return wantarray ? @units : \@units;
 }
 

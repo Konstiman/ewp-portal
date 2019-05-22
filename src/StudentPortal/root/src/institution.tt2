@@ -169,6 +169,7 @@
 <div class="container">
     [% IF institution.units && institution.units.size > 0 %]
         <h2>Organizační jednotky</h2>
+        <p>Níže jsou vypsány všechny organizační jednotky této instituce. Seznam je seřazen abecedně.</p>
         <div class="container">
             [% FOREACH unit = institution.units %]
                 <div class="row">
