@@ -6,7 +6,7 @@ use parent 'Catalyst::Model::DBI';
 
 use File::Slurp;
 
-my @config = read_file( '../config' );
+my @config = read_file('../config');
 my $dsn    = $config[0];
 my $user   = $config[1];
 my $passwd = $config[2];
@@ -14,12 +14,14 @@ my $passwd = $config[2];
 chomp( $dsn, $user, $passwd );
 
 __PACKAGE__->config(
-    dsn           => $dsn,
-    user          => $user,
-    password      => $passwd,
-    options       => {
-        mysql_enable_utf8 => 1
+    dsn      => $dsn,
+    user     => $user,
+    password => $passwd,
+    options  => {
+        mysql_enable_utf8    => 1,
+        mysql_auto_reconnect => 1
     },
+    mysql_auto_reconnect => 1
 );
 
 =head1 NAME
@@ -36,6 +38,37 @@ DBI Model Class.
 
 =head1 METHODS
 
+=head2 simpleSelect
+
+Wrapper method for select procedure that repeats in every db call.
+
+=cut
+
+sub simpleSelect {
+    my $self   = shift;
+    my $query  = shift;
+    my @params = @_;
+
+    my $dbh = $self->dbh;
+
+    $dbh->{mysql_auto_reconnect} = 1;
+
+    my $sth = $dbh->prepare($query);
+
+    if ( !$sth || !$sth->execute(@params) ) {
+        warn "Error when executing query:\n$query\nParams: " . join( ', ', @params ) . "\n\n" . $dbh->errstr();
+        return wantarray ? () : [];
+    }
+
+    my @result = ();
+    while ( my $row = $sth->fetchrow_hashref() ) {
+        push @result, $row;
+    }
+    $sth->finish();
+
+    return wantarray ? @result : \@result;
+}
+
 =head2 getInstitutionsListData
 
 Returns list with all institutions and their basic data:
@@ -49,16 +82,14 @@ sub getInstitutionsListData {
     my $self   = shift;
     my $filter = shift;
 
-    my $dbh = $self->dbh;
-
     my $where  = '';
     my @params = ();
-    if ( $filter && $filter->{ country } ) {
+    if ( $filter && $filter->{country} ) {
         $where = 'WHERE country.id = ?';
-        push @params, $filter->{ country };
+        push @params, $filter->{country};
     }
 
-    my $sth = $dbh->prepare("
+    my @data = $self->simpleSelect( "
         SELECT  inst.id,
                 inst.identifier,
                 names.name,
@@ -72,42 +103,35 @@ sub getInstitutionsListData {
                 LEFT JOIN language lang ON names.language = lang.id
                 LEFT JOIN address addr ON inst.location_address = addr.id
                 LEFT JOIN country ON addr.country = country.id
-        $where"
-    );
-
-    if ( !$sth || !$sth->execute(@params) ) {
-        warn "fail: " . $dbh->errstr();
-        return wantarray ? () : [];
-    }
+        $where", @params );
 
     my %id2Inst = ();
-    while (my $row = $sth->fetchrow_hashref()) {
+    foreach my $row (@data) {
         my $identifier = $row->{'identifier'};
-        $id2Inst{ $identifier } = {
+        $id2Inst{$identifier} = {
             id           => $row->{'id'},
             identifier   => $identifier,
             abbreviation => $row->{'abbreviation'} || '',
-            logoUrl      => $row->{'logo_url'}     || '',
-            city         => $row->{'locality'}     || '',
-            country      => $row->{'country_cz'}   || '',
-        } unless $id2Inst{ $identifier };
-        
-        $id2Inst{ $identifier }->{ names } = [  ] unless $id2Inst{ $identifier }->{ names };
-        if ( !( grep { $_ eq $row->{'name'} } @{ $id2Inst{ $identifier }->{ names } } ) ) {
-            push @{ $id2Inst{ $identifier }->{ names } }, $row->{'name'};
+            logoUrl      => $row->{'logo_url'} || '',
+            city         => $row->{'locality'} || '',
+            country      => $row->{'country_cz'} || '',
+        } unless $id2Inst{$identifier};
+
+        $id2Inst{$identifier}->{names} = [] unless $id2Inst{$identifier}->{names};
+        if ( !( grep { $_ eq $row->{'name'} } @{ $id2Inst{$identifier}->{names} } ) ) {
+            push @{ $id2Inst{$identifier}->{names} }, $row->{'name'};
         }
 
         if ( $row->{'abbr_lang'} && $row->{'abbr_lang'} eq 'en' ) {
-            $id2Inst{ $identifier }->{ mainName } = $row->{'name'};
+            $id2Inst{$identifier}->{mainName} = $row->{'name'};
         }
     }
-    $sth->finish();
 
     my @institutions = ( values %id2Inst );
     foreach my $inst (@institutions) {
-        $inst->{ mainName } = shift @{ $inst->{ names } } if !$inst->{ mainName };
+        $inst->{mainName} = shift @{ $inst->{names} } if !$inst->{mainName};
     }
-    @institutions = sort { $a->{ mainName } cmp $b->{ mainName } } @institutions;
+    @institutions = sort { $a->{mainName} cmp $b->{mainName} } @institutions;
 
     return wantarray ? @institutions : \@institutions;
 }
@@ -122,9 +146,7 @@ contains country id and country name.
 sub getInstitutionCountriesData {
     my $self = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  distinct country.id,
                 country.name_cz name 
         FROM    institution inst
@@ -132,17 +154,6 @@ sub getInstitutionCountriesData {
                 LEFT JOIN country ON addr.country = country.id
         ORDER BY name'
     );
-
-    if ( !$sth || !$sth->execute() ) {
-        warn "fail: " . $dbh->errstr();
-        return wantarray ? () : [];
-    }
-
-    my @result = ();
-    while (my $row = $sth->fetchrow_hashref()) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -157,9 +168,7 @@ sub getAddress {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @data = $self->simpleSelect( '
         SELECT  recipient,
                 addressLines,
                 buildingNumber,
@@ -175,22 +184,13 @@ sub getAddress {
                 country.name_cz country
         FROM    address
                 LEFT JOIN country ON address.country = country.id
-        WHERE   address.id = ?'
-    );
+        WHERE   address.id = ?', $id );
 
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
+    if ( !@data || !$data[0] ) {
         return undef;
     }
 
-    my $row = $sth->fetchrow_hashref();
-    $sth->finish();
-
-    if (!$row) {
-        return undef;
-    }
-
-    return $row;
+    return $data[0];
 }
 
 =head2 getInstitutionData
@@ -203,39 +203,29 @@ sub getInstitutionData {
     my $self  = shift;
     my $ident = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @data = $self->simpleSelect( '
         SELECT  inst.id,
                 inst.abbreviation,
                 inst.logo_url logoUrl,
                 inst.location_address locationAddressId,
                 inst.mailing_address mailingAddressId
         FROM    institution inst
-        WHERE   inst.identifier = ?'
+        WHERE   inst.identifier = ?', $ident
     );
 
-    if ( !$sth || !$sth->execute($ident) ) {
-        warn "fail: " . $dbh->errstr();
+    if ( !@data || !$data[0] ) {
         return undef;
     }
 
-    my $row = $sth->fetchrow_hashref();
-    $sth->finish();
+    my %result = %{$data[0]};
 
-    if (!$row) {
-        return undef;
-    }
-
-    my %result = %{ $row };
-
-    my $id         = $row->{id};
+    my $id         = $data[0]->{id};
     my @names      = $self->getInstitutionNames($id);
     my $mainName   = '';
     my @otherNames = ();
-    foreach my $nameRef ( @names ) {
-        if ( $nameRef->{ lang } && lc $nameRef->{ lang } eq 'en' ) {
-            $mainName = $nameRef->{ name };
+    foreach my $nameRef (@names) {
+        if ( $nameRef->{lang} && lc $nameRef->{lang} eq 'en' ) {
+            $mainName = $nameRef->{name};
         }
         else {
             push @otherNames, $nameRef;
@@ -243,16 +233,16 @@ sub getInstitutionData {
     }
     if ( !$mainName ) {
         my $nameRef = shift @otherNames;
-        $mainName   = $nameRef->{ name };
+        $mainName = $nameRef->{name};
     }
 
-    $result{ name } = $mainName;
-    $result{ otherNames } = \@otherNames;
-    $result{ websites } = $self->getInstitutionWebsites($id);
-    $result{ factsheets } = $self->getInstitutionFactsheets($id);
-    $result{ contacts } = $self->getInstitutionContacts($id);
-    $result{ locationAddress } = $self->getAddress($result{ locationAddressId }) if $result{ locationAddressId };
-    $result{ mailingAddress } = $self->getAddress($result{ mailingAddressId }) if $result{ mailingAddressId };
+    $result{name}            = $mainName;
+    $result{otherNames}      = \@otherNames;
+    $result{websites}        = $self->getInstitutionWebsites($id);
+    $result{factsheets}      = $self->getInstitutionFactsheets($id);
+    $result{contacts}        = $self->getInstitutionContacts($id);
+    $result{locationAddress} = $self->getAddress( $result{locationAddressId} ) if $result{locationAddressId};
+    $result{mailingAddress}  = $self->getAddress( $result{mailingAddressId} ) if $result{mailingAddressId};
 
     # TODO organizational units
 
@@ -272,16 +262,17 @@ sub getInstitutionCities {
 
     my @result = ();
 
-    foreach my $inst ( @institutions ) {
-        my $ident = $inst->{ identifier };
-        my $name  = $inst->{ mainName };
-        my $city    = $inst->{ city }    || '';
-        my $country = $inst->{ country } || '';
-        push @result, {
+    foreach my $inst (@institutions) {
+        my $ident   = $inst->{identifier};
+        my $name    = $inst->{mainName};
+        my $city    = $inst->{city} || '';
+        my $country = $inst->{country} || '';
+        push @result,
+          {
             address    => "$city $country",
             name       => $name,
             identifier => $ident
-        }
+          };
     }
 
     return wantarray ? @result : \@result;
@@ -297,28 +288,14 @@ sub getInstitutionNames {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  inst.name,
                 lang.abbreviation lang,
                 lang.flag_url flagUrl
         FROM    institution_name inst
                 LEFT JOIN language lang ON inst.language = lang.id
-        WHERE   inst.institution = ?'
+        WHERE   inst.institution = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -333,28 +310,14 @@ sub getInstitutionWebsites {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  inst.url,
                 lang.abbreviation lang,
                 lang.flag_url flagUrl
         FROM    institution_website inst
                 LEFT JOIN language lang ON inst.language = lang.id
-        WHERE   inst.institution = ?'
+        WHERE   inst.institution = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -371,27 +334,15 @@ sub getInstitutionFactsheets {
 
     my $dbh = $self->dbh;
 
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  inst.url,
                 inst.name,
                 lang.abbreviation lang,
                 lang.flag_url flagUrl
         FROM    institution_factsheet inst
                 LEFT JOIN language lang ON inst.language = lang.id
-        WHERE   inst.institution = ?'
+        WHERE   inst.institution = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -406,29 +357,19 @@ sub getInstitutionContacts {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @data = $self->simpleSelect( '
         SELECT  contact
         FROM    institution_contact
-        WHERE   institution = ?'
+        WHERE   institution = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
 
     my @result = ();
 
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        my $contactId = $row->{ contact } || next;
-        my $contact = $self->getContact($contactId);
+    foreach my $row ( @data ) {
+        my $contactId = $row->{contact} || next;
+        my $contact   = $self->getContact($contactId);
         push @result, $contact if $contact;
     }
-    $sth->finish();
-
-    #@result = sort { scalar( @{ $b->{ names } } ) <=> scalar( @{ $a->{ names } } ) } @result;
 
     return wantarray ? @result : \@result;
 }
@@ -444,12 +385,12 @@ sub getContact {
     my $id   = shift;
 
     my %contact = ();
-    $contact{ names }  = $self->_getContactNames($id);
-    $contact{ emails } = $self->_getContactEmails($id);
-    $contact{ phones } = $self->_getContactPhones($id);
-    $contact{ faxes }  = $self->_getContactFaxes($id);
+    $contact{names}  = $self->_getContactNames($id);
+    $contact{emails} = $self->_getContactEmails($id);
+    $contact{phones} = $self->_getContactPhones($id);
+    $contact{faxes}  = $self->_getContactFaxes($id);
 
-    $contact{ description } = $self->_getContactDescription($id);
+    $contact{description} = $self->_getContactDescription($id);
 
     return \%contact;
 }
@@ -458,27 +399,13 @@ sub _getContactNames {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  con.name,
                 lang.flag_url flagUrl
         FROM    contact_name con
                 LEFT JOIN language lang ON con.language = lang.id
-        WHERE   con.contact = ?'
+        WHERE   con.contact = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -487,25 +414,11 @@ sub _getContactEmails {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  con.email
         FROM    contact_email con
-        WHERE   con.contact = ?'
+        WHERE   con.contact = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -514,25 +427,11 @@ sub _getContactPhones {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  con.phoneNumber
         FROM    contact_phone con
-        WHERE   con.contact = ?'
+        WHERE   con.contact = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -541,25 +440,11 @@ sub _getContactFaxes {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  con.faxNumber
         FROM    contact_fax con
-        WHERE   con.contact = ?'
+        WHERE   con.contact = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
@@ -568,27 +453,13 @@ sub _getContactDescription {
     my $self = shift;
     my $id   = shift;
 
-    my $dbh = $self->dbh;
-
-    my $sth = $dbh->prepare('
+    my @result = $self->simpleSelect( '
         SELECT  con.text,
                 lang.flag_url flagUrl
         FROM    contact_description con
                 LEFT JOIN language lang ON con.language = lang.id
-        WHERE   con.contact = ?'
+        WHERE   con.contact = ?', $id
     );
-
-    if ( !$sth || !$sth->execute($id) ) {
-        warn "fail: " . $dbh->errstr();
-        return undef;
-    }
-
-    my @result = ();
-
-    while ( my $row = $sth->fetchrow_hashref() ) {
-        push @result, $row;
-    }
-    $sth->finish();
 
     return wantarray ? @result : \@result;
 }
