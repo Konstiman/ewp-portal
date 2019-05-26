@@ -13,10 +13,13 @@ Modul slouzi ke stazeni a ulozeni XML katalogu instituci Erasmus Without Paper.
 =cut
 
 use DBI;
+use Entity::AcademicTerm;
 use Entity::Address;
 use Entity::Contact;
 use Entity::Institution;
 use Entity::LearningOpportunity;
+use Entity::LearningOpportunityInstance;
+use Entity::ResultDistribution;
 use Entity::Unit;
 use HTTP::Request;
 use LWP::UserAgent;
@@ -58,6 +61,28 @@ has 'statusLine' => (
     isa => 'Str'
 );
 
+=head2 C<userAgent : LWP::UserAgent>
+
+Objekt LWP::UserAgent pro stahovani XML.
+
+=cut
+
+has 'userAgent' => (
+    is  => 'ro',
+    isa => 'LWP::UserAgent',
+    required => 1,
+    lazy => 1,
+    builder => '_buildUserAgent',
+    predicate => 'hasUserAgent'
+);
+
+sub _buildUserAgent {
+    return LWP::UserAgent->new(
+        agent      => 'EWP_Catalogue_Downloader/' . VERSION,
+        cookie_jar => {}
+    );
+}
+
 =head1 METHODS
 
 =head2 C<downloadCatalogue () : Str>
@@ -87,11 +112,7 @@ sub downloadXML {
     my $self = shift;
     my $url  = shift;
 
-    # TODO hodit ven do atributu
-    my $agent = LWP::UserAgent->new(
-        agent      => 'EWP_Catalogue_Downloader/' . VERSION,
-        cookie_jar => {}
-    );
+    my $agent = $self->userAgent;
     $agent->timeout(10);
 
     my $request = HTTP::Request->new( GET => $url );
@@ -179,10 +200,8 @@ sub _getEndpoint {
 
     return if !@instAPIs;
 
-    # TODO volba verze
     my $instAPI = shift @instAPIs;
 
-    # TODO ukladani nastaveni (napr. max-hei-ids)
     my $url = $xpc->findvalue( './ns:url[text()]', $instAPI );
 
     return $url;
@@ -354,9 +373,6 @@ sub _parseContactXML {
         my $lang = $name->getAttribute('xml:lang') || 'unknown';
         $contactObject->setName( $lang, $name->textContent() );
     }
-
-    # TODO vsecky jmena
-    # skipping given names & family names
 
     my $gender = ( $xpc->findnodes( 'c:gender', $contactElement ) )[0];
     if ($gender) {
@@ -606,6 +622,7 @@ sub getOpportunitiesFromEndpoint {
 
     foreach my $losId (@$courseIdsRef) {
         my $xml = $self->downloadXML( $endpoint . "?hei_id=$heiId&los_id=$losId" );
+        print $self->statusLine . "\n" if $self->statusLine;
 
         if ( !$xml ) {
             next;
@@ -629,9 +646,166 @@ sub parseCourseXML {
 
     my $opportunity = Entity::LearningOpportunity->new();
 
-    # TODO
+    my $dom = XML::LibXML->load_xml( string => $xml );
+    my $xpc = new XML::LibXML::XPathContext($dom);
+
+    $xpc->registerNs( 'lo', 'https://github.com/erasmus-without-paper/ewp-specs-api-courses/tree/stable-v1' );
+
+    my $loElement = ( $xpc->findnodes('//lo:learningOpportunitySpecification') )[0];
+
+    my $identifier = $xpc->findvalue( './lo:los-id[text()]', $loElement );
+    if ($identifier) {
+        $opportunity->identifier($identifier);
+    }
+
+    my $code = $xpc->findvalue( './lo:los-code[text()]', $loElement );
+    if ($code) {
+        $opportunity->code($code);
+    }
+
+    my $unitId = $xpc->findvalue( './lo:ounit-id[text()]', $loElement );
+    if ($unitId) {
+        $opportunity->unitIdentifier($unitId);
+    }
+
+    my @titles = $xpc->findnodes( './lo:title', $loElement );
+    foreach my $nameElem (@titles) {
+        my $name = $nameElem->textContent;
+        my $lang = $nameElem->getAttribute('xml:lang') || 'unknown';
+        $opportunity->setTitle( $lang, $name );
+    }
+
+    my $type = $xpc->findvalue( './lo:type[text()]', $loElement );
+    if ($type) {
+        $opportunity->type($type);
+    }
+
+    my $subjectArea = $xpc->findvalue( './lo:subjectArea[text()]', $loElement );
+    if ($subjectArea) {
+        $opportunity->subjectArea($subjectArea);
+    }
+
+    my $iscedCode = $xpc->findvalue( './lo:iscedCode[text()]', $loElement );
+    if ($iscedCode) {
+        $opportunity->iscedCode($iscedCode);
+    }
+
+    my $eqfLevel = $xpc->findvalue( './lo:eqfLevel[text()]', $loElement );
+    if ($eqfLevel) {
+        $opportunity->eqfLevel($eqfLevel);
+    }
+
+    my @webs = $xpc->findnodes( './lo:url', $loElement );
+    foreach my $webElem (@webs) {
+        my $web  = $webElem->textContent;
+        my $lang = $webElem->getAttribute('xml:lang') || 'unknown';
+        $opportunity->setWebsite( $web, $lang );
+    }
+
+    my @descs = $xpc->findnodes( './lo:description', $loElement );
+    foreach my $textElem (@descs) {
+        my $text = $textElem->textContent;
+        my $lang = $textElem->getAttribute('xml:lang') || 'unknown';
+        $opportunity->setDescription( $lang, $text );
+    }
+
+    my @instanceElements = $xpc->findnodes( './lo:learningOpportunityInstance', $loElement );
+    foreach my $instanceElement (@instanceElements) {
+        my $instanceObject = $self->_parseCourseInstance($instanceElement, $xpc);
+        $opportunity->addInstance($instanceObject) if $instanceObject;
+    }
+
+    my @children = $xpc->findnodes( './lo:contains/lo:los-id', $loElement );
+    foreach my $childId (@children) {
+        $opportunity->addChildId($childId->textContent());
+    }
 
     return $opportunity;
+}
+
+sub _parseCourseInstance {
+    my $self = shift;
+    my $elem = shift;
+    my $xpc  = shift;
+
+    my $instance = Entity::LearningOpportunityInstance->new();
+
+    my $identifier = $xpc->findvalue( './lo:loi-id[text()]', $elem );
+    if ($identifier) {
+        $instance->identifier($identifier);
+    }
+
+    my $start = $xpc->findvalue( './lo:start[text()]', $elem );
+    if ($start) {
+        $instance->start($start);
+    }
+
+    my $end = $xpc->findvalue( './lo:end[text()]', $elem );
+    if ($end) {
+        $instance->end($end);
+    }
+
+    $xpc->registerNs( 'trm', 'https://github.com/erasmus-without-paper/ewp-specs-types-academic-term/tree/stable-v1' );
+    my $termElement = ( $xpc->findnodes( './trm:academic-term', $elem ) )[ 0 ];
+    if ($termElement) {
+        my $termObject = $self->_parseAcademicTerm($termElement, $xpc);
+        $instance->academicTerm($termObject) if $termObject;
+    }
+
+    my $rdElement = ( $xpc->findnodes( './lo:resultDistribution', $elem ) )[ 0 ];
+    if ($rdElement) {
+        my $rdObject = $self->_parseResultDistribution($rdElement, $xpc);
+        $instance->resultDistribution($rdObject) if $rdObject;
+    }
+
+    return $instance;
+}
+
+sub _parseAcademicTerm {
+    my $self = shift;
+    my $elem = shift;
+    my $xpc  = shift;
+
+    my $term = Entity::AcademicTerm->new();
+
+    my $identifier = $xpc->findvalue( './trm:academic-year-id[text()]', $elem );
+    if ($identifier) {
+        $term->identifier($identifier);
+    }
+
+    my $ewpIdentifier = $xpc->findvalue( './trm:ewp-id[text()]', $elem );
+    if ($ewpIdentifier) {
+        $term->ewpIdentifier($identifier);
+    }
+
+    my $start = $xpc->findvalue( './trm:start-date[text()]', $elem );
+    if ($start) {
+        $term->start($start);
+    }
+
+    my $end = $xpc->findvalue( './trm:end-date[text()]', $elem );
+    if ($end) {
+        $term->end($end);
+    }
+
+    return $term;
+}
+
+sub _parseResultDistribution {
+    my $self = shift;
+    my $elem = shift;
+    my $xpc  = shift;
+
+    my $res = Entity::ResultDistribution->new();
+
+    my @descs = $xpc->findnodes( './lo:description', $elem );
+    foreach my $textElem (@descs) {
+        my $text = $textElem->textContent;
+        my $lang = $textElem->getAttribute('xml:lang') || 'unknown';
+        $res->setDescription( $lang, $text );
+    }
+
+    return $res;
 }
 
 no Moose;

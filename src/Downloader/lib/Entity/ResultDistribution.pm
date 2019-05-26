@@ -61,6 +61,8 @@ has 'resultDistribution' => (
     default => sub { [] },
     handles => {
         addResultDistribution => 'push'
+    }
+);
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

@@ -47,6 +47,17 @@ has 'code' => (
     isa => 'Str'
 );
 
+=head2 C<unitIdentifier : Str>
+
+Kod organizacni jednotky, pod kterou studijni prilezitost spada.
+
+=cut
+
+has 'unitIdentifier' => (
+    is => 'rw',
+    isa => 'Str'
+);
+
 =head2 C<subjectArea : Str>
 
 Erasmus subject area kod kurzu.
@@ -134,22 +145,6 @@ has 'description' => (
     }
 );
 
-=head2 C<credits : ArrayRef[HashRef[Str]]>
-
-Informace o ziskatelnych kreditech.
-
-=cut
-
-has 'credits' => (
-	is => 'rw',
-    isa => 'ArrayRef[HashRef[Str]]',
-    traits => ['Array'],
-    default => sub { [ ] },
-    handles => {
-        addCredit => 'push'
-    }
-);
-
 =head2 C<instances : ArrayRef[Entity::LearningOpportunityInstance]>
 
 Instance studijni prilezitosti.
@@ -177,17 +172,6 @@ Typ studijni prilezitosti.
 has 'type' => (
 	is => 'rw',
     isa => 'OpportunityType'
-);
-
-=head2 C<resultDistribution : Entity::ResultDistribution>
-
-Objekt s vysledky studijni prilezitosti.
-
-=cut
-
-has 'resultDistribution' => (
-	is => 'rw',
-    isa => 'Object'
 );
 
 =head2 C<childIds : ArrayRef[Str]>

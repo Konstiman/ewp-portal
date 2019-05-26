@@ -6,11 +6,9 @@ use utf8;
 
 =head1 DESCRIPTION
 
-TODO dokumentace
+Modul pro ukladani EWP entit do databaze.
 
 =cut
-
-use Entity::Institution;
 
 =head1 ATTRIBUTES
 
@@ -39,6 +37,18 @@ sub clearDatabase {
 
     # index
     $self->dbh->do( 'ALTER TABLE institution DROP INDEX mainindex' );
+    # learning opportunity
+    $self->dbh->do('DELETE FROM academic_term_name');
+    $self->dbh->do('DELETE FROM academic_term');
+    $self->dbh->do('DELETE FROM credit');
+    $self->dbh->do('DELETE FROM result_distribution_category');
+    $self->dbh->do('DELETE FROM result_distribution_description');
+    $self->dbh->do('DELETE FROM grading_scheme');
+    $self->dbh->do('DELETE FROM opportunity_instance');
+    $self->dbh->do('DELETE FROM opportunity_website');
+    $self->dbh->do('DELETE FROM opportunity_title');
+    $self->dbh->do('DELETE FROM opportunity_description');
+    $self->dbh->do('DELETE FROM learning_opportunity');
     # unit
     $self->dbh->do('DELETE FROM unit_name');
     $self->dbh->do('DELETE FROM unit_website');
@@ -60,8 +70,6 @@ sub clearDatabase {
     $self->dbh->do('DELETE FROM contact_description');
     $self->dbh->do('DELETE FROM contact');
     $self->dbh->do('DELETE FROM address');
-
-    # TODO mazat vsechno (ve spravnem poradi!)
 }
 
 =head2 C<getCountryId ( code : Str ) : Int>
@@ -177,8 +185,6 @@ sub saveAddress {
 
 Ulozi objekt instituce do databaze do tabulky `institution` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
-
 =cut
 
 sub saveInstitution {
@@ -284,8 +290,6 @@ sub saveInstitution {
 
 Ulozi objekt kontaktu do databaze do tabulky `contact` a navazujicich podtabulek. Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
-
 =cut
 
 sub saveContact {
@@ -386,8 +390,6 @@ sub saveContact {
 sub _getLangMap {
     my $self = shift;
 
-    # TODO cachovat
-
     my $sth = $self->dbh->prepare('SELECT id, abbreviation FROM language');
 
     if ( !$sth ) {
@@ -431,8 +433,6 @@ sub _saveLanguage {
 Ulozi objekt organizacni jednotky do databaze do tabulky `organizational_unit` a navazujicich tabulek. 
 Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
-
 =cut
 
 sub saveUnit {
@@ -447,7 +447,6 @@ sub saveUnit {
         $self->saveAddress( $unit->mailingAddress );
     }
 
-    # TODO root + parent
     my $res = $self->dbh->do( 
         'INSERT INTO unit (identifier, institution, code, abbreviation, logo_url, location_address, mailing_address) 
         VALUES (?,?,?,?,?,?,?)', 
@@ -555,14 +554,99 @@ sub saveUnit {
 Ulozi objekt studijni prilezitosti do databaze do tabulky `learning_opportunity` a navazujicich tabulek. 
 Objektu nastavi id nove vlozeneho zaznamu.
 
-TODO refaktorovat do vice mensich metod.
-
 =cut
 
 sub saveOpportunity {
+    my $self        = shift;
     my $opportunity = shift;
 
-    # TODO
+    return if !$opportunity->unitIdentifier;
+
+    my $res = $self->dbh->do( 
+        'INSERT INTO learning_opportunity 
+        (unit, identifier, code, type, subject_area, isced_code, eqf_level) 
+        VALUES ((SELECT id FROM unit WHERE identifier = ?),?,?,
+        (SELECT id FROM opportunity_type WHERE name_en = ?),?,?,?)', 
+        undef, 
+        $opportunity->unitIdentifier,
+        $opportunity->identifier,
+        $opportunity->code,
+        $opportunity->type,
+        $opportunity->subjectArea,
+        $opportunity->iscedCode,
+        $opportunity->eqfLevel
+    );
+
+    if ( !$res ) {
+
+        warn "execution failed:" . $self->dbh->errstr();
+        return 0;
+    }
+
+    $opportunity->id( $self->dbh->{mysql_insertid} );
+
+    my $langMap = $self->_getLangMap();
+
+    if ( $opportunity->titles ) {
+        foreach my $lang ( keys %{ $opportunity->titles } ) {
+            my $langId = undef;
+            if ( $lang ne 'unknown' ) {
+                $langId = $langMap->{ lc $lang };
+                if ( !$langId ) {
+                    $langId = $self->_saveLanguage($lang);
+                    $langMap->{ lc $lang } = $langId;
+                }
+            }
+
+            my $res = $self->dbh->do( 
+                'INSERT INTO opportunity_title (learning_opportunity, title, language) VALUES (?,?,?)', 
+                undef, $opportunity->id, $opportunity->titles->{$lang}, $langId 
+            );
+
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ( $opportunity->websites ) {
+        foreach my $url ( keys %{ $opportunity->websites } ) {
+            my $lang   = $opportunity->websites->{$url};
+            my $langId = undef;
+            if ( $lang ne 'unknown' ) {
+                $langId = $langMap->{ lc $lang };
+                if ( !$langId ) {
+                    $langId = $self->_saveLanguage($lang);
+                    $langMap->{ lc $lang } = $langId;
+                }
+            }
+
+            my $res = $self->dbh->do( 
+                'INSERT INTO opportunity_website (learning_opportunity, url, language) VALUES (?,?,?)', 
+                undef, $opportunity->id, $url, $langId 
+            );
+
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
+
+    if ( $opportunity->description ) {
+        foreach my $lang ( keys %{ $opportunity->description } ) {
+            my $langId = undef;
+            if ( $lang ne 'unknown' ) {
+                $langId = $langMap->{ lc $lang };
+                if ( !$langId ) {
+                    $langId = $self->_saveLanguage($lang);
+                    $langMap->{ lc $lang } = $langId;
+                }
+            }
+
+            my $res = $self->dbh->do( 
+                'INSERT INTO opportunity_description (learning_opportunity, text, language) VALUES (?,?,?)', 
+                undef, $opportunity->id, $opportunity->description->{$lang}, $langId 
+            );
+
+            warn "execution failed:" . $self->dbh->errstr() if !$res;
+        }
+    }
 
     return $opportunity;
 }
@@ -739,7 +823,17 @@ sub _getOpportunityText {
 
     my $text = '';
 
-    # TODO
+    if ( $opportunity->titles ) {
+        $text .= join( ' ', values %{ $opportunity->titles } );
+    }
+
+    if ( $opportunity->websites ) {
+        $text .= "\n" . join( "\n", keys %{ $opportunity->websites } );
+    }
+
+    if ( $opportunity->description ) {
+        $text .= join( ' ', values %{ $opportunity->description } );
+    }
 
     return $text;
 }

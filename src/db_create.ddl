@@ -93,4 +93,8 @@ INSERT INTO language (abbreviation, flag_url) VALUES ('sv', '/static/images/flag
 INSERT INTO language (abbreviation, flag_url) VALUES ('cz', '/static/images/flags/cz.png');
 INSERT INTO language (abbreviation, flag_url) VALUES ('sk', '/static/images/flags/sk.png');
 INSERT INTO language (abbreviation, flag_url) VALUES ('it', '/static/images/flags/it.png');
+INSERT INTO opportunity_type(name_en, name_cz) VALUES ('Degree Programme', 'Program');
+INSERT INTO opportunity_type(name_en, name_cz) VALUES ('Module', 'Modul');
+INSERT INTO opportunity_type(name_en, name_cz) VALUES ('Course', 'Kurz');
+INSERT INTO opportunity_type(name_en, name_cz) VALUES ('Class', 'Přednáška');
 

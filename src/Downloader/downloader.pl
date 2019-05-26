@@ -35,6 +35,7 @@ my $manager = Manager::EntityManager->new( dbh => $dbh );
 $manager->clearDatabase();
 
 foreach my $heiId ( keys %$heis2endpoints ) {
+    next if $heiId ne 'pomodoro.university.it';
     my $endpoints = $heis2endpoints->{$heiId};
 
     my %indexData = ();

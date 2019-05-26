@@ -91,6 +91,33 @@ has 'academicTerm' => (
     isa => 'Object'
 );
 
+=head2 C<resultDistribution : Entity::ResultDistribution>
+
+Objekt s vysledky studijni prilezitosti.
+
+=cut
+
+has 'resultDistribution' => (
+	is => 'rw',
+    isa => 'Object'
+);
+
+=head2 C<credits : ArrayRef[HashRef[Str]]>
+
+Informace o ziskatelnych kreditech.
+
+=cut
+
+has 'credits' => (
+	is => 'rw',
+    isa => 'ArrayRef[HashRef[Str]]',
+    traits => ['Array'],
+    default => sub { [ ] },
+    handles => {
+        addCredit => 'push'
+    }
+);
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 
