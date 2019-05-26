@@ -10,7 +10,7 @@ CREATE TABLE contact_phone (contact int(10) NOT NULL, phoneNumber varchar(100));
 CREATE TABLE country (id int(10) NOT NULL AUTO_INCREMENT, code varchar(100) NOT NULL, name_en varchar(1000), name_cz varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci, PRIMARY KEY (id));
 CREATE TABLE credit (opportunity_instance int(10) NOT NULL, scheme varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, level varchar(64), value decimal(10, 2) NOT NULL);
 CREATE TABLE grading_scheme (opportunity_instance int(10) NOT NULL, label varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci, description varchar(4000) CHARACTER SET utf8 COLLATE utf8_general_ci, language int(10));
-CREATE TABLE institution (id int(10) NOT NULL AUTO_INCREMENT, identifier varchar(64) NOT NULL UNIQUE, abbreviation varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci, logo_url varchar(1000), location_address int(10), mailing_address int(10), PRIMARY KEY (id));
+CREATE TABLE institution (id int(10) NOT NULL AUTO_INCREMENT, identifier varchar(64) NOT NULL UNIQUE, abbreviation varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci, logo_url varchar(1000), location_address int(10), mailing_address int(10), `fulltext` text, PRIMARY KEY (id));
 CREATE TABLE institution_contact (institution int(10) NOT NULL, contact int(10) NOT NULL, PRIMARY KEY (institution, contact));
 CREATE TABLE institution_factsheet (institution int(10) NOT NULL, name varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci, url varchar(1000) NOT NULL, language int(10));
 CREATE TABLE institution_name (institution int(10) NOT NULL, name varchar(1000) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL, language int(10));

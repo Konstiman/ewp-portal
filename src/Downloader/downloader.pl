@@ -79,8 +79,10 @@ foreach my $heiId ( keys %$heis2endpoints ) {
         }
     }
 
-    $manager->createIndex($indexData{institution}, ( $indexData{units} || [] ), ( $indexData{courses} || [] ) );
+    $manager->saveIndex($indexData{institution}, ( $indexData{units} || [] ), ( $indexData{courses} || [] ) );
 }
+
+$manager->createIndex();
 
 $dbh->disconnect();
 

@@ -37,6 +37,8 @@ Smaze obsah neciselnikovych tabulek v db.
 sub clearDatabase {
     my $self = shift;
 
+    # index
+    $self->dbh->do( 'ALTER TABLE institution DROP INDEX mainindex' );
     # unit
     $self->dbh->do('DELETE FROM unit_name');
     $self->dbh->do('DELETE FROM unit_website');
@@ -567,19 +569,91 @@ sub saveOpportunity {
     return $opportunity;
 }
 
-=head2 C<createIndex (institution : Entity::Institution, units : ArrayRef[Entity::Unit], courses : ArrayRef[Entity::LearningOpportunity]) : None>
+=head2 C<saveIndex (institution : Entity::Institution, units : ArrayRef[Entity::Unit], courses : ArrayRef[Entity::LearningOpportunity]) : Bool>
 
 Z objektu instituce a k ni souvisejicich jednotek a kurzu vytvori a ulozi textovou reprezentaci instituce, ktera je nasledne
 pouzita pro fulltextove vyhledavani na Studentskem portalu.
 
 =cut
 
-sub createIndex {
+sub saveIndex {
+    my $self        = shift;
     my $institution = shift;
     my $units       = shift;
     my $courses     = shift;
 
+    my $content = '';
+
+    $content .= $self->_getInstitutionText($institution);
+
+    foreach my $unit (@$units) {
+        $content .= $self->_getUnitText($unit);
+    }
+
+    foreach my $course (@$courses) {
+        $content .= $self->_getOpportunityText($course);
+    }
+
+    return $self->dbh->do( 'UPDATE institution SET `fulltext` = ? WHERE id = ?', undef, $content, $institution->id );
+}
+
+sub _getInstitutionText {
+    my $self        = shift;
+    my $institution = shift;
+
+    my $text = '';
+
+    if ( $institution->names ) {
+        $text .= join( ' ', values %{ $institution->names } );
+    }
+
+    if ( $institution->abbreviation ) {
+        $text .= "\n" . $institution->abbreviation;
+    }
+
+    if ( $institution->websites ) {
+        $text .= "\n" . join( "\n", keys %{ $institution->websites } );
+    }
+
+    # TODO kontakty
+
+    # TODO adresy
+
+    return $text;
+}
+
+sub _getUnitText {
+    my $self = shift;
+    my $unit = shift;
+
+    my $text = '';
+
     # TODO
+
+    return $text;
+}
+
+sub _getOpportunityText {
+    my $self        = shift;
+    my $opportunity = shift;
+
+    my $text = '';
+
+    # TODO
+
+    return $text;
+}
+
+=head2 C<createIndex () : Bool>
+
+Vytvori fulltext index pro vyhledavani v institucich.
+
+=cut
+
+sub createIndex {
+    my $self = shift;
+
+    return $self->dbh->do( 'CREATE FULLTEXT INDEX mainindex ON institution(`fulltext`)' );
 }
 
 no Moose;
