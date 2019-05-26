@@ -11,7 +11,8 @@
                         class="form-control" 
                         placeholder="zadejte klíčová slova: např. 'faculty of informatics germany'"
                         name="keywords"
-                        id="searchBox">
+                        id="searchBox"
+                        [% IF keywords %]value="[% keywords %]" autofocus[% END %]>
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit">hledat</button>
                     </div>

@@ -86,6 +86,16 @@ sub getInstitutionsListData {
         $where = 'WHERE country.id = ?';
         push @params, $filter->{country};
     }
+    if ( $filter && $filter->{keywords} ) {
+        if ( $where ) {
+            $where .= ' AND';
+        } 
+        else {
+            $where .= 'WHERE';
+        }
+        $where .= " MATCH (`fulltext`) AGAINST (? IN NATURAL LANGUAGE MODE)";
+        push @params, $filter->{keywords};
+    }
 
     my @data = $self->simpleSelect( "
         SELECT  inst.id,

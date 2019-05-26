@@ -52,6 +52,11 @@ sub list : Local : Args(0) {
         $c->stash( filteredCountry => $parameters->{'countryFilter'} );
     }
 
+    if ( $parameters->{'keywords'} ) {
+        $filter{keywords} = $parameters->{'keywords'};
+        $c->stash( keywords => $parameters->{'keywords'} );
+    }
+
     my @institutions = $c->model('DBIModel')->getInstitutionsListData( \%filter );
     $c->stash( institutions => \@institutions );
 
