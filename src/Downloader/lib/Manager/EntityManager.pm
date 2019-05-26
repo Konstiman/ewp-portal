@@ -567,6 +567,21 @@ sub saveOpportunity {
     return $opportunity;
 }
 
+=head2 C<createIndex (institution : Entity::Institution, units : ArrayRef[Entity::Unit], courses : ArrayRef[Entity::LearningOpportunity]) : None>
+
+Z objektu instituce a k ni souvisejicich jednotek a kurzu vytvori a ulozi textovou reprezentaci instituce, ktera je nasledne
+pouzita pro fulltextove vyhledavani na Studentskem portalu.
+
+=cut
+
+sub createIndex {
+    my $institution = shift;
+    my $units       = shift;
+    my $courses     = shift;
+
+    # TODO
+}
+
 no Moose;
 __PACKAGE__->meta->make_immutable;
 

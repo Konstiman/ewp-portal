@@ -37,6 +37,7 @@ $manager->clearDatabase();
 foreach my $heiId ( keys %$heis2endpoints ) {
     my $endpoints = $heis2endpoints->{$heiId};
 
+    my %indexData = ();
     my $institutionObject = undef;
 
     if ( $endpoints->{'institutions'} ) {
@@ -46,6 +47,7 @@ foreach my $heiId ( keys %$heis2endpoints ) {
         if ($institutionObject) {
             ++$statsDownloaded;
             if ( $manager->saveInstitution($institutionObject) ) {
+                $indexData{ institution } = $institutionObject;
                 ++$statsSaved;
             }
         }
@@ -62,6 +64,7 @@ foreach my $heiId ( keys %$heis2endpoints ) {
         foreach my $unit (@unitObjects) {
             $manager->saveUnit($unit);
         }
+        $indexData{ units } = \@unitObjects;
     }
 
     if ( $endpoints->{'simple-course-replication'} && $endpoints->{'courses'} ) {
@@ -72,8 +75,11 @@ foreach my $heiId ( keys %$heis2endpoints ) {
             foreach my $loObject (@loObjects) {
                 $manager->saveOpportunity($loObject);
             }
+            $indexData{ courses } = \@loObjects;
         }
     }
+
+    $manager->createIndex($indexData{institution}, ( $indexData{units} || [] ), ( $indexData{courses} || [] ) );
 }
 
 $dbh->disconnect();
