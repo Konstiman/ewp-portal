@@ -93,11 +93,11 @@ sub getInstitutionsListData {
         else {
             $where .= 'WHERE';
         }
-        $where .= " MATCH (`fulltext`) AGAINST (? IN NATURAL LANGUAGE MODE)";
+        $where .= " MATCH (`fulltext`) AGAINST (? IN BOOLEAN MODE)";
         push @params, $filter->{keywords};
     }
 
-    my @data = $self->simpleSelect( "
+    my $query = "
         SELECT  inst.id,
                 inst.identifier,
                 names.name,
@@ -111,7 +111,23 @@ sub getInstitutionsListData {
                 LEFT JOIN language lang ON names.language = lang.id
                 LEFT JOIN address addr ON inst.location_address = addr.id
                 LEFT JOIN country ON addr.country = country.id
-        $where", @params );
+        $where";
+
+    my @data = ();
+    eval {
+        @data = $self->simpleSelect( $query, @params );
+    };
+
+    if ( $@ ) {
+        if ( $filter && $filter->{keywords} ) {
+            my $keywords = pop @params;
+            push @params, $self->_sanitizeKeywords($keywords);
+            @data = $self->simpleSelect( $query, @params );
+        }
+        else {
+            die $@;
+        }
+    }
 
     my %id2Inst = ();
     foreach my $row (@data) {
@@ -142,6 +158,20 @@ sub getInstitutionsListData {
     @institutions = sort { $a->{mainName} cmp $b->{mainName} } @institutions;
 
     return wantarray ? @institutions : \@institutions;
+}
+
+sub _sanitizeKeywords {
+    my $self = shift;
+    my $text = shift;
+
+    $text =~ s/[^A-Za-zÀ-Ö\uØ-öø-ÿ\s\+\-\"]//sgi;
+    $text =~ s/\+[-\+]+/+/sgi;
+    $text =~ s/\-[-\+]+/-/sgi;
+    $text =~ s/\"\"+/"/sgi;
+
+    $text =~ s/([^\s])[-\+]/$1/sgi;
+
+    return $text;
 }
 
 =head2 C<getInstitutionCountriesData () : ArrayRef[HashRef[Str]]>

@@ -9,7 +9,7 @@
                 <div class="input-group mb-3">
                     <input type="text" 
                         class="form-control" 
-                        placeholder="zadejte klíčová slova: např. 'faculty of informatics germany'"
+                        placeholder="zadejte klíčová slova: např. &quot;university of warsaw&quot;"
                         name="keywords"
                         id="searchBox"
                         [% IF keywords %]value="[% keywords %]" autofocus[% END %]>
@@ -17,8 +17,6 @@
                         <button class="btn btn-primary" type="submit">hledat</button>
                     </div>
                 </div>
-            </form>
-            <form>
                 <label for="countryFilter">Země</label>
                 <div class="input-group mb-3">
                     <select class="form-control" 

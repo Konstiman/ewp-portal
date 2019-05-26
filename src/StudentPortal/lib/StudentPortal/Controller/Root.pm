@@ -54,7 +54,9 @@ sub list : Local : Args(0) {
 
     if ( $parameters->{'keywords'} ) {
         $filter{keywords} = $parameters->{'keywords'};
-        $c->stash( keywords => $parameters->{'keywords'} );
+        my $keywords = $parameters->{'keywords'};
+        $keywords =~ s/"/&quot;/sgi;
+        $c->stash( keywords => $keywords );
     }
 
     my @institutions = $c->model('DBIModel')->getInstitutionsListData( \%filter );

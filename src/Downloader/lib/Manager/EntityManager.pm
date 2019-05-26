@@ -292,8 +292,6 @@ sub saveContact {
     my $self    = shift;
     my $contact = shift;
 
-    # TODO
-
     if ( $contact->locationAddress ) {
         $self->saveAddress( $contact->locationAddress );
     }
@@ -615,9 +613,87 @@ sub _getInstitutionText {
         $text .= "\n" . join( "\n", keys %{ $institution->websites } );
     }
 
-    # TODO kontakty
+    if ( $institution->contacts ) {
+        foreach my $contact ( @{ $institution->contacts } ) {
+            $text .= "\n" . $self->_getContactText($contact);
+        }
+    }
 
-    # TODO adresy
+    if ( $institution->locationAddress ) {
+        $text .= "\n" . $self->_getAddressText($institution->locationAddress);
+    }
+
+    if ( $institution->mailingAddress ) {
+        $text .= "\n" . $self->_getAddressText($institution->mailingAddress);
+    }
+
+    return $text;
+}
+
+sub _getContactText {
+    my $self    = shift;
+    my $contact = shift;
+
+    my $text = '';
+
+    if ( $contact->names ) {
+        $text .= join( ' ', values %{ $contact->names } );
+    }
+
+    if ( $contact->emails ) {
+        $text .= join( ' ', @{ $contact->emails } );
+    }
+
+    if ( $contact->description ) {
+        $text .= join( ' ', values %{ $contact->description } );
+    }
+
+    if ( $contact->locationAddress ) {
+        $text .= "\n" . $self->_getAddressText($contact->locationAddress);
+    }
+
+    if ( $contact->mailingAddress ) {
+        $text .= "\n" . $self->_getAddressText($contact->mailingAddress);
+    }
+
+    return $text;
+}
+
+sub _getAddressText {
+    my $self    = shift;
+    my $address = shift;
+
+    my $text = '';
+
+    $text .= "\n" . $address->recipient if $address->recipient;
+    $text .= "\n" . $address->lines if $address->lines;
+    $text .= "\n" . $address->buildingName if $address->buildingName;
+
+    if ( $address->streetName && $address->buildingNumber ) {
+        $text .= "\n" . $address->streetName . ' ' . $address->buildingNumber;
+    }
+
+    $text .= "\n" . $address->pobox if $address->pobox;
+    $text .= "\n" . $address->deliveryPoint if $address->deliveryPoint;
+    $text .= "\n" . $address->postalCode if $address->postalCode;
+    $text .= "\n" . $address->locality if $address->locality;
+    $text .= "\n" . $address->region if $address->region;
+
+    if ( $address->country ) {
+        my $sth = $self->dbh->prepare('SELECT name_en, name_cz FROM country WHERE code = ?');
+
+        if ( $sth && $sth->execute($address->country) ) {
+            my $ref = $sth->fetchrow_hashref();
+            $sth->finish();
+            if ($ref) {
+                $text .= "\n" . $ref->{'name_en'} if $ref->{'name_en'};
+                $text .= "\n" . $ref->{'name_cz'} if $ref->{'name_cz'};
+            }
+        }
+        else {
+            warn "execution failed: " . $self->dbh->errstr();
+        }
+    }
 
     return $text;
 }
@@ -628,7 +704,31 @@ sub _getUnitText {
 
     my $text = '';
 
-    # TODO
+    if ( $unit->names ) {
+        $text .= join( ' ', values %{ $unit->names } );
+    }
+
+    if ( $unit->abbreviation ) {
+        $text .= "\n" . $unit->abbreviation;
+    }
+
+    if ( $unit->websites ) {
+        $text .= "\n" . join( "\n", keys %{ $unit->websites } );
+    }
+
+    if ( $unit->contacts ) {
+        foreach my $contact ( @{ $unit->contacts } ) {
+            $text .= "\n" . $self->_getContactText($contact);
+        }
+    }
+
+    if ( $unit->locationAddress ) {
+        $text .= "\n" . $self->_getAddressText($unit->locationAddress);
+    }
+
+    if ( $unit->mailingAddress ) {
+        $text .= "\n" . $self->_getAddressText($unit->mailingAddress);
+    }
 
     return $text;
 }

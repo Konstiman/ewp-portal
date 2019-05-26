@@ -7,6 +7,13 @@
     <p>Vyhledávání je fulltextové a hledá nad všemi informacemi vyšších vzdělávacích
     institucí na tomto portálu. Lze tedy hledat např. podle názvů institucí a jejich
     organizačních jednotek, kontaktních osob, adres nebo nabízených kurzů.</p>
+    <p>Defaultně budou vyhledány všechny instituce, které odpovídají alespoň jednomu 
+    klíčovému slovu (tzn. pokud zadáte např. spojení <i>brno informatics</i>,
+    zobrazí se jak brněnské instituce, tak instituce spojené s informatikou. Pro upřesnění,
+    že dané klíčové slovo je povinné, slouží znak <strong>+</strong>. Tedy <i>+brno
+    informatics</i> zobrazí jen brněnské instituce a ty, které souvisejí s informatikou,
+    zobrazí přednostně. Uvozovky <strong>""</strong> pak slouží pro specifikaci konkrétního
+    slovního spojení.</p>
     <p>Většina obsahu portálu je v anglickém jazyce, proto je doporučeno zadat klíčová
     slova dotazu v angličtině. </p>
 
@@ -16,7 +23,7 @@
         <div class="input-group mb-3">
             <input type="text" 
                    class="form-control" 
-                   placeholder="zadejte klíčová slova: např. 'faculty of informatics germany'"
+                   placeholder="zadejte klíčová slova: např. &quot;university of warsaw&quot;"
                    name="keywords"
                    autofocus>
             <div class="input-group-append">
