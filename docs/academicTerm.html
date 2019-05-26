@@ -16,9 +16,11 @@
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
   <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
     <ul>
-      <li><a href="#description-:-HashRef-Str">description : HashRef[Str]</a></li>
-      <li><a href="#gradingScheme-:-HashRef-HashRef-Str">gradingScheme : HashRef[HashRef[Str]]</a></li>
-      <li><a href="#resultDistribution-:-ArrayRef-HashRef-Str">resultDistribution : ArrayRef[HashRef[Str]]</a></li>
+      <li><a href="#identifier-:-Str">identifier : Str</a></li>
+      <li><a href="#ewpIdentifier-:-Str">ewpIdentifier : Str</a></li>
+      <li><a href="#names-:-HashRef-Str">names : HashRef[Str]</a></li>
+      <li><a href="#start-:-Str">start : Str</a></li>
+      <li><a href="#end-:-Str">end : Str</a></li>
     </ul>
   </li>
   <li><a href="#AUTHOR">AUTHOR</a></li>
@@ -27,27 +29,35 @@
 
 <h1 id="NAME">NAME</h1>
 
-<p>Entity::ResultDistribution</p>
+<p>Entity::AcademicTerm</p>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
-<p>Entita reprezentujici vysledky studijni prilezitosti v siti EWP.</p>
+<p>Entita reprezentujici akademicke obdobi v siti EWP.</p>
 
 <h1 id="ATTRIBUTES">ATTRIBUTES</h1>
 
-<h2 id="description-:-HashRef-Str"><code>description : HashRef[Str]</code></h2>
+<h2 id="identifier-:-Str"><code>identifier : Str</code></h2>
 
-<p>Hash popisu v ruznych jazycich.</p>
+<p>Identifikator akademickeho roku.</p>
+
+<h2 id="ewpIdentifier-:-Str"><code>ewpIdentifier : Str</code></h2>
+
+<p>Identifikator akademickeho roku v ramci EWP.</p>
+
+<h2 id="names-:-HashRef-Str"><code>names : HashRef[Str]</code></h2>
+
+<p>Hash jmen v ruznych jazycich.</p>
 
 <pre><code>    { &#39;en&#39; =&gt; &#39;sample text&#39; }</code></pre>
 
-<h2 id="gradingScheme-:-HashRef-HashRef-Str"><code>gradingScheme : HashRef[HashRef[Str]]</code></h2>
+<h2 id="start-:-Str"><code>start : Str</code></h2>
 
-<p>Hash s informacemi o schematu znamkovani.</p>
+<p>Zacatek obdobi.</p>
 
-<h2 id="resultDistribution-:-ArrayRef-HashRef-Str"><code>resultDistribution : ArrayRef[HashRef[Str]]</code></h2>
+<h2 id="end-:-Str"><code>end : Str</code></h2>
 
-<p>Hash s informacemi o rozlozeni znamek.</p>
+<p>Konec obdobi.</p>
 
 <h1 id="AUTHOR">AUTHOR</h1>
 

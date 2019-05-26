@@ -3,6 +3,10 @@ package Entity::Address;
 use Moose;
 use namespace::autoclean;
 
+=head1 NAME
+
+Entity::Address
+
 =head1 DESCRIPTION
 
 Entita reprezentujici adresu v siti EWP.
@@ -167,5 +171,16 @@ has 'country' => (
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
+=head1 AUTHOR
+
+Jan Konstant
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

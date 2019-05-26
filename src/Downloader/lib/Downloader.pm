@@ -6,6 +6,10 @@ use namespace::autoclean;
 
 =pod
 
+=head1 NAME
+
+Downloader
+
 =head1 DESCRIPTION
 
 Modul slouzi ke stazeni a ulozeni XML katalogu instituci Erasmus Without Paper.
@@ -556,7 +560,7 @@ sub parseUnitXML {
     return $unitObject;
 }
 
-=head2 C<getOpportunityIdsFromEndpoint ( endpoint : Str, heiId : Str ) : ArrayRef[Str]>
+=head2 C<getOpportunityIdsFromEndpoint ( endpoint : Str, heiId : Str ) : ArrayRef[Str]>
 
 Stahne a rozparsuje seznam id studijnich prilezitosti dane HEI z daneho endpointu.
 
@@ -810,5 +814,16 @@ sub _parseResultDistribution {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
+=head1 AUTHOR
+
+Jan Konstant
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

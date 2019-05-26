@@ -61,7 +61,7 @@ __PACKAGE__->setup();
 
 =head1 NAME
 
-StudentPortal - Catalyst based application
+StudentPortal
 
 =head1 SYNOPSIS
 
@@ -69,15 +69,12 @@ StudentPortal - Catalyst based application
 
 =head1 DESCRIPTION
 
-[enter your description here]
-
-=head1 SEE ALSO
-
-L<StudentPortal::Controller::Root>, L<Catalyst>
+Tato aplikace byla vyvinuta na zaklade navrhu v bakalarske praci
+Studentsky portal pro Erasmus Without Paper. Autor Jan Konstant, 2019.
 
 =head1 AUTHOR
 
-Jan Konstant,,,
+Jan Konstant
 
 =head1 LICENSE
 

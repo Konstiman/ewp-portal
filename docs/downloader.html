@@ -12,11 +12,13 @@
 
 
 <ul id="index">
+  <li><a href="#NAME">NAME</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
   <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
     <ul>
       <li><a href="#status-:-Str">status : Str</a></li>
       <li><a href="#status-:-Str1">status : Str</a></li>
+      <li><a href="#userAgent-:-LWP::UserAgent">userAgent : LWP::UserAgent</a></li>
     </ul>
   </li>
   <li><a href="#METHODS">METHODS</a>
@@ -34,8 +36,14 @@
       <li><a href="#parseCourseXML-xml-:-Str-:-Entity::LearningOpportunity">parseCourseXML ( xml : Str ) : Entity::LearningOpportunity</a></li>
     </ul>
   </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
   <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Downloader</p>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -50,6 +58,10 @@
 <h2 id="status-:-Str1"><code>status : Str</code></h2>
 
 <p>Textovy komentar stavu downloaderu.</p>
+
+<h2 id="userAgent-:-LWP::UserAgent"><code>userAgent : LWP::UserAgent</code></h2>
+
+<p>Objekt LWP::UserAgent pro stahovani XML.</p>
 
 <h1 id="METHODS">METHODS</h1>
 
@@ -97,13 +109,21 @@
 
 <p>Rozparsuje xml se studijni prilezitosti. Vraci objekt tridy LearningOpportunity.</p>
 
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jan Konstant</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
 <h1 id="POD-ERRORS">POD ERRORS</h1>
 
 <p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
 
 <dl>
 
-<dt id="Around-line-544">Around line 544:</dt>
+<dt id="Around-line-585">Around line 585:</dt>
 <dd>
 
 <p>Non-ASCII character seen before =encoding in &#39;:&nbsp;Str&#39;. Assuming UTF-8</p>

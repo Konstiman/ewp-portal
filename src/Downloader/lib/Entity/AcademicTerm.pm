@@ -6,6 +6,10 @@ use Moose::Util::TypeConstraints;
 
 =pod
 
+=head1 NAME
+
+Entity::AcademicTerm
+
 =head1 DESCRIPTION
 
 Entita reprezentujici akademicke obdobi v siti EWP.
@@ -78,5 +82,16 @@ has 'end' => (
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
+=head1 AUTHOR
+
+Jan Konstant
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

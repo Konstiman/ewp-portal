@@ -12,6 +12,7 @@
 
 
 <ul id="index">
+  <li><a href="#NAME">NAME</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
   <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
     <ul>
@@ -28,13 +29,22 @@
       <li><a href="#saveContact-contact-:-Entity::Contact-:-Entity::Contact">saveContact ( contact : Entity::Contact ) : Entity::Contact</a></li>
       <li><a href="#saveUnit-unit-:-Entity::Unit-:-Entity::Unit">saveUnit ( unit : Entity::Unit ) : Entity::Unit</a></li>
       <li><a href="#saveOpportunity-opportunity-:-Entity::LearningOpportunity-:-Entity::LearningOpportunity">saveOpportunity ( opportunity : Entity::LearningOpportunity ) : Entity::LearningOpportunity</a></li>
+      <li><a href="#saveIndex-institution-:-Entity::Institution-units-:-ArrayRef-Entity::Unit-courses-:-ArrayRef-Entity::LearningOpportunity-:-Bool">saveIndex (institution : Entity::Institution, units : ArrayRef[Entity::Unit], courses : ArrayRef[Entity::LearningOpportunity]) : Bool</a></li>
+      <li><a href="#createIndex-:-Bool">createIndex () : Bool</a></li>
     </ul>
   </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
 </ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Manager::EntityManager</p>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
-<p>TODO dokumentace</p>
+<p>Modul pro ukladani EWP entit do databaze.</p>
 
 <h1 id="ATTRIBUTES">ATTRIBUTES</h1>
 
@@ -66,25 +76,47 @@
 
 <p>Ulozi objekt instituce do databaze do tabulky `institution` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
 
-<p>TODO refaktorovat do vice mensich metod.</p>
-
 <h2 id="saveContact-contact-:-Entity::Contact-:-Entity::Contact"><code>saveContact ( contact : Entity::Contact ) : Entity::Contact</code></h2>
 
 <p>Ulozi objekt kontaktu do databaze do tabulky `contact` a navazujicich podtabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
-
-<p>TODO refaktorovat do vice mensich metod.</p>
 
 <h2 id="saveUnit-unit-:-Entity::Unit-:-Entity::Unit"><code>saveUnit ( unit : Entity::Unit ) : Entity::Unit</code></h2>
 
 <p>Ulozi objekt organizacni jednotky do databaze do tabulky `organizational_unit` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
 
-<p>TODO refaktorovat do vice mensich metod.</p>
-
 <h2 id="saveOpportunity-opportunity-:-Entity::LearningOpportunity-:-Entity::LearningOpportunity"><code>saveOpportunity ( opportunity : Entity::LearningOpportunity ) : Entity::LearningOpportunity</code></h2>
 
 <p>Ulozi objekt studijni prilezitosti do databaze do tabulky `learning_opportunity` a navazujicich tabulek. Objektu nastavi id nove vlozeneho zaznamu.</p>
 
-<p>TODO refaktorovat do vice mensich metod.</p>
+<h2 id="saveIndex-institution-:-Entity::Institution-units-:-ArrayRef-Entity::Unit-courses-:-ArrayRef-Entity::LearningOpportunity-:-Bool"><code>saveIndex (institution : Entity::Institution, units : ArrayRef[Entity::Unit], courses : ArrayRef[Entity::LearningOpportunity]) : Bool</code></h2>
+
+<p>Z objektu instituce a k ni souvisejicich jednotek a kurzu vytvori a ulozi textovou reprezentaci instituce, ktera je nasledne pouzita pro fulltextove vyhledavani na Studentskem portalu.</p>
+
+<h2 id="createIndex-:-Bool"><code>createIndex () : Bool</code></h2>
+
+<p>Vytvori fulltext index pro vyhledavani v institucich.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jan Konstant</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+<h1 id="POD-ERRORS">POD ERRORS</h1>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-13">Around line 13:</dt>
+<dd>
+
+<p>Non-ASCII character seen before =encoding in &#39;EWP&nbsp;entit&#39;. Assuming UTF-8</p>
+
+</dd>
+</dl>
 
 
 </body>

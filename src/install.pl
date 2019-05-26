@@ -32,6 +32,7 @@ Pripravuji instalaci. Budou instalovany nasledujici moduly:
 - File::Slurp
 - Catalyst::Runtime
 - Catalyst::Devel
+- StackTrace
 
 Instalaci modulu lze preskocit. Je ale mozne, ze pak software nebude mozne spustit kvuli chybejicim zavislostem.
 
@@ -47,7 +48,7 @@ EOF
 }
 else {
     system 'cpan DBD::mysql LWP::UserAgent HTTP::Request XML::LibXML' 
-		. ' Moose File::Slurp Catalyst::Runtime Catalyst::Devel';
+		. ' Moose File::Slurp Catalyst::Runtime Catalyst::Devel StackTrace';
 
     if ( $? == -1 ) {
         print "\nInstalace se nezdarila: $!\n";

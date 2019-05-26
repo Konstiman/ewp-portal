@@ -12,26 +12,32 @@
 
 
 <ul id="index">
+  <li><a href="#NAME">NAME</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
   <li><a href="#ATTRIBUTES">ATTRIBUTES</a>
     <ul>
       <li><a href="#id-:-Int">id : Int</a></li>
       <li><a href="#identifier-:-Str">identifier : Str</a></li>
       <li><a href="#code-:-Str">code : Str</a></li>
+      <li><a href="#unitIdentifier-:-Str">unitIdentifier : Str</a></li>
       <li><a href="#subjectArea-:-Str">subjectArea : Str</a></li>
       <li><a href="#iscedCode-:-Str">iscedCode : Str</a></li>
       <li><a href="#eqfLevel-:-Str">eqfLevel : Str</a></li>
       <li><a href="#titles-:-Str">titles : Str</a></li>
       <li><a href="#websites-:-Str">websites : Str</a></li>
       <li><a href="#description-:-HashRef-Str">description : HashRef[Str]</a></li>
-      <li><a href="#credits-:-ArrayRef-HashRef-Str">credits : ArrayRef[HashRef[Str]]</a></li>
       <li><a href="#instances-:-ArrayRef-Entity::LearningOpportunityInstance">instances : ArrayRef[Entity::LearningOpportunityInstance]</a></li>
       <li><a href="#type-:-OpportunityType">type : OpportunityType</a></li>
-      <li><a href="#resultDistribution-:-Entity::ResultDistribution">resultDistribution : Entity::ResultDistribution</a></li>
       <li><a href="#childIds-:-ArrayRef-Str">childIds : ArrayRef[Str]</a></li>
     </ul>
   </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
 </ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Entity::LearningOpportunity</p>
 
 <h1 id="DESCRIPTION">DESCRIPTION</h1>
 
@@ -50,6 +56,10 @@
 <h2 id="code-:-Str"><code>code : Str</code></h2>
 
 <p>Lidsky citelny kod studijni prilezitosti v ramci EWP.</p>
+
+<h2 id="unitIdentifier-:-Str"><code>unitIdentifier : Str</code></h2>
+
+<p>Kod organizacni jednotky, pod kterou studijni prilezitost spada.</p>
 
 <h2 id="subjectArea-:-Str"><code>subjectArea : Str</code></h2>
 
@@ -77,10 +87,6 @@
 
 <pre><code>    { &#39;en&#39; =&gt; &#39;sample text&#39; }</code></pre>
 
-<h2 id="credits-:-ArrayRef-HashRef-Str"><code>credits : ArrayRef[HashRef[Str]]</code></h2>
-
-<p>Informace o ziskatelnych kreditech.</p>
-
 <h2 id="instances-:-ArrayRef-Entity::LearningOpportunityInstance"><code>instances : ArrayRef[Entity::LearningOpportunityInstance]</code></h2>
 
 <p>Instance studijni prilezitosti.</p>
@@ -89,13 +95,17 @@
 
 <p>Typ studijni prilezitosti.</p>
 
-<h2 id="resultDistribution-:-Entity::ResultDistribution"><code>resultDistribution : Entity::ResultDistribution</code></h2>
-
-<p>Objekt s vysledky studijni prilezitosti.</p>
-
 <h2 id="childIds-:-ArrayRef-Str"><code>childIds : ArrayRef[Str]</code></h2>
 
 <p>Pole identifikatoru podrizenych studijnich prilezitosti.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jan Konstant</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.</p>
 
 
 </body>

@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#simpleSelect-query-:-Str-parameters-:-Array-Str-:-ArrayRef-HashRef-Str">simpleSelect (query : Str, parameters : Array[Str]) : ArrayRef[HashRef[Str]]</a></li>
+      <li><a href="#getInstitutionsListData-:-ArrayRef-HashRef-Str">getInstitutionsListData () : ArrayRef[HashRef[Str]]</a></li>
+      <li><a href="#getInstitutionCountriesData-:-ArrayRef-HashRef-Str">getInstitutionCountriesData () : ArrayRef[HashRef[Str]]</a></li>
+      <li><a href="#getAddress-id-:-Int-:-HashRef-Str">getAddress ( id : Int ) : HashRef[Str]</a></li>
+      <li><a href="#getInstitutionInformation-identifier-:-Str-:-HashRef-Item">getInstitutionInformation ( identifier : Str ) : HashRef[Item]</a></li>
+      <li><a href="#getInstitutionCities-:-ArrayRef-HashRef-Str">getInstitutionCities () : ArrayRef[HashRef[Str]]</a></li>
+      <li><a href="#getContact-id-:-Int-:-HashRef-Str">getContact ( id : Int ) : HashRef[Str]</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>StudentPortal::Model::DBIModel - DBI Model Class</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>DBI Model Class. Hlavni datovy model pro Student Portal.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="simpleSelect-query-:-Str-parameters-:-Array-Str-:-ArrayRef-HashRef-Str"><code>simpleSelect (query : Str, parameters : Array[Str]) : ArrayRef[HashRef[Str]]</code></h2>
+
+<p>Obalova metoda pro select z databaze, ktery se vola ve vsech metodach stejne.</p>
+
+<h2 id="getInstitutionsListData-:-ArrayRef-HashRef-Str"><code>getInstitutionsListData () : ArrayRef[HashRef[Str]]</code></h2>
+
+<p>Vraci seznam vsech instituci a zakladni informace o nich: id, identifier, names, abbreviation, logo, locality, country.</p>
+
+<p>Jedinym nepovinnym parametrem je HashRef s parametry filtrovani.</p>
+
+<h2 id="getInstitutionCountriesData-:-ArrayRef-HashRef-Str"><code>getInstitutionCountriesData () : ArrayRef[HashRef[Str]]</code></h2>
+
+<p>Vraci pole vsech statu, ve kterych je nejaka instituce zobrazitelna portalem. Zaznam obsahuje nazev zeme a jeji id.</p>
+
+<h2 id="getAddress-id-:-Int-:-HashRef-Str"><code>getAddress ( id : Int ) : HashRef[Str]</code></h2>
+
+<p>Vraci HashRef s informacemi o jedne konkretni adrese.</p>
+
+<h2 id="getInstitutionInformation-identifier-:-Str-:-HashRef-Item"><code>getInstitutionInformation ( identifier : Str ) : HashRef[Item]</code></h2>
+
+<p>Vraci HashRef s informacemi o jedne konkretni instituci.</p>
+
+<h2 id="getInstitutionCities-:-ArrayRef-HashRef-Str"><code>getInstitutionCities () : ArrayRef[HashRef[Str]]</code></h2>
+
+<p>Vraci pole s informacemi o adresach vsech instituci. Soucasti kazdeho zaznamu je mesto a stat, kde instituce lezi, a jeji identifikator.</p>
+
+<h2 id="getContact-id-:-Int-:-HashRef-Str"><code>getContact ( id : Int ) : HashRef[Str]</code></h2>
+
+<p>Vraci HashRef s informacemi o jednom konkretnim kontaktu.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Jan Konstant</p>
+
+<h1 id="LICENSE">LICENSE</h1>
+
+<p>This library is free software, you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+</body>
+
+</html>
+
+

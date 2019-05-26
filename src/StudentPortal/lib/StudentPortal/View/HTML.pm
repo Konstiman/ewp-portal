@@ -15,15 +15,11 @@ __PACKAGE__->config(
 
 =head1 NAME
 
-StudentPortal::View::HTML - TT View for StudentPortal
+StudentPortal::View::HTML - TT View pro StudentPortal
 
 =head1 DESCRIPTION
 
-TT View for StudentPortal.
-
-=head1 SEE ALSO
-
-L<StudentPortal>
+TT View pro StudentPortal. Jako wrapper pouziva soubor wrapper.tt2.
 
 =head1 AUTHOR
 

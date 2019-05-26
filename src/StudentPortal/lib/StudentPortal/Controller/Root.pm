@@ -16,17 +16,17 @@ __PACKAGE__->config( namespace => '' );
 
 =head1 NAME
 
-StudentPortal::Controller::Root - Root Controller for StudentPortal
+StudentPortal::Controller::Root - Root Controller pro StudentPortal
 
 =head1 DESCRIPTION
 
-[enter your description here]
+Obsluhuje root na serveru poskytovanym studentskym portalem.
 
 =head1 METHODS
 
 =head2 index
 
-The root page (/)
+Hlavni stranka, zobrazuje menu a uvodni fotku.
 
 =cut
 
@@ -38,7 +38,7 @@ sub index : Path : Args(0) {
 
 =head2 list
 
-The institution list page (/list)
+Seznam instituci, umoznuje vyhledavat a filtrovat.
 
 =cut
 
@@ -70,7 +70,7 @@ sub list : Local : Args(0) {
 
 =head2 institution
 
-The particular institution page (/institution/:identifier)
+Stranka konkretni instituce. Zobrazuje vsechny dostupne informace o instituci.
 
 =cut
 
@@ -86,7 +86,7 @@ sub institution : Local : Args(1) {
 
 =head2 map
 
-The map page (/map)
+Stranka s mapou.
 
 =cut
 
@@ -102,7 +102,7 @@ sub map : Local : Args(0) {
 
 =head2 search
 
-The search page (/search)
+Stranka s vyhledavacim polem a navodem jak vyhledavat.
 
 =cut
 
@@ -114,7 +114,7 @@ sub search : Local : Args(0) {
 
 =head2 default
 
-Standard 404 error page
+Standardni 404 error page.
 
 =cut
 
@@ -124,17 +124,11 @@ sub default : Path {
     $c->response->status(404);
 }
 
-=head2 end
-
-Attempt to render a view, if needed.
-
-=cut
-
 sub end : ActionClass('RenderView') { }
 
 =head1 AUTHOR
 
-Jan Konstant,,,
+Jan Konstant
 
 =head1 LICENSE
 

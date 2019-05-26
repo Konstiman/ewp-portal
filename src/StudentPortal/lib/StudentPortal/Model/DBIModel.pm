@@ -26,19 +26,15 @@ __PACKAGE__->config(
 
 StudentPortal::Model::DBIModel - DBI Model Class
 
-=head1 SYNOPSIS
-
-See L<StudentPortal>
-
 =head1 DESCRIPTION
 
-DBI Model Class. Main data model for Student Portal.
+DBI Model Class. Hlavni datovy model pro Student Portal.
 
 =head1 METHODS
 
 =head2 C<simpleSelect (query : Str, parameters : Array[Str]) : ArrayRef[HashRef[Str]]>
 
-Wrapper method for select procedure that repeats in every db call.
+Obalova metoda pro select z databaze, ktery se vola ve vsech metodach stejne.
 
 =cut
 
@@ -69,10 +65,10 @@ sub simpleSelect {
 
 =head2 C<getInstitutionsListData () : ArrayRef[HashRef[Str]]>
 
-Returns list with all institutions and their basic data:
-id, identifier, names, abbreviation, logo, locality and country.
+Vraci seznam vsech instituci a zakladni informace o nich:
+id, identifier, names, abbreviation, logo, locality, country.
 
-Takes one parameter: hash with filter options.
+Jedinym nepovinnym parametrem je HashRef s parametry filtrovani.
 
 =cut
 
@@ -176,8 +172,8 @@ sub _sanitizeKeywords {
 
 =head2 C<getInstitutionCountriesData () : ArrayRef[HashRef[Str]]>
 
-Returns list with all countries with at least one institution. Each entry
-contains country id and country name.
+Vraci pole vsech statu, ve kterych je nejaka instituce zobrazitelna
+portalem. Zaznam obsahuje nazev zeme a jeji id.
 
 =cut
 
@@ -198,7 +194,7 @@ sub getInstitutionCountriesData {
 
 =head2 C<getAddress ( id : Int ) : HashRef[Str]>
 
-Returns hash with information about the address specified by parameter.
+Vraci HashRef s informacemi o jedne konkretni adrese.
 
 =cut
 
@@ -233,7 +229,7 @@ sub getAddress {
 
 =head2 C<getInstitutionInformation ( identifier : Str ) : HashRef[Item]>
 
-Returns hash with information about one particular institution.
+Vraci HashRef s informacemi o jedne konkretni instituci.
 
 =cut
 
@@ -285,9 +281,10 @@ sub getInstitutionInformation {
     return \%result;
 }
 
-=head2 getInstitutionCities
+=head2 C<getInstitutionCities () : ArrayRef[HashRef[Str]]>
 
-Returns array of hashes with information about institutions home city and country.
+Vraci pole s informacemi o adresach vsech instituci. Soucasti kazdeho zaznamu je
+mesto a stat, kde instituce lezi, a jeji identifikator.
 
 =cut
 
@@ -382,9 +379,9 @@ sub _getInstitutionContacts {
     return wantarray ? @result : \@result;
 }
 
-=head2 getContact
+=head2 C<getContact ( id : Int ) : HashRef[Str]>
 
-Returns information about one particular contact.
+Vraci HashRef s informacemi o jednom konkretnim kontaktu.
 
 =cut
 

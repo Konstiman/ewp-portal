@@ -4,6 +4,10 @@ use Moose;
 use namespace::autoclean;
 use utf8;
 
+=head1 NAME
+
+Manager::EntityManager
+
 =head1 DESCRIPTION
 
 Modul pro ukladani EWP entit do databaze.
@@ -852,5 +856,16 @@ sub createIndex {
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
+
+=head1 AUTHOR
+
+Jan Konstant
+
+=head1 LICENSE
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;
